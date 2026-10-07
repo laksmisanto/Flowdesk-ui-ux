@@ -1,0 +1,3617 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flowdesk — UI Design</title>
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#080810" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS (from Phase 4)
+═══════════════════════════════════════ */
+:root {
+  --brand-300: #a5b4fc; --brand-400: #818cf8;
+  --brand-500: #6366f1; --brand-600: #4f46e5;
+  --brand-700: #4338ca; --brand-900: #312e81; --brand-950: #1e1b4b;
+  --accent-400: #a78bfa; --accent-500: #8b5cf6; --accent-600: #7c3aed;
+  --success-500:#10b981; --success-600:#059669;
+  --warning-500:#f59e0b; --warning-600:#d97706;
+  --danger-500: #f43f5e; --danger-600: #e11d48;
+  --info-500:   #3b82f6;
+  --dev-color:      #4f46e5;
+  --student-color:  #10b981;
+  --research-color: #8b5cf6;
+  --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+  --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
+  --gray-600:#4b5563; --gray-700:#374151; --gray-800:#1f2937; --gray-900:#111827;
+  --surface-base:    #0f0f1a;
+  --surface-raised:  #13131f;
+  --surface-overlay: #1a1a2e;
+  --surface-border:  rgb(var(--fg) / .07);
+  --surface-text:    rgb(var(--fg) / .88);
+  --surface-muted: rgb(var(--fg) / .58);
+  --surface-faint: rgb(var(--fg) / .5);
+  --fg: 255 255 255;
+  --page: #080810;
+  --surface-subtle:  rgb(var(--fg) / .08);
+  --font-display:'Plus Jakarta Sans',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --text-xs:11px; --text-sm:12px; --text-base:14px; --text-md:15px;
+  --text-lg:17px; --text-xl:20px; --text-2xl:24px; --text-3xl:30px;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
+  --space-5:20px; --space-6:24px; --space-8:32px; --space-10:40px;
+  --radius-sm:6px; --radius-md:10px; --radius-lg:14px;
+  --radius-xl:20px; --radius-full:9999px;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06);
+  --shadow-md:0 4px 12px rgba(0,0,0,.1),0 2px 6px rgba(0,0,0,.07);
+  --shadow-lg:0 8px 28px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.08);
+  --shadow-xl:0 20px 50px rgba(0,0,0,.22),0 8px 20px rgba(0,0,0,.12);
+  --shadow-brand:0 4px 16px rgba(99,102,241,.35);
+  --shadow-brand-lg:0 8px 28px rgba(99,102,241,.45);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --dur-fast:120ms; --dur-normal:200ms; --dur-slow:350ms;
+  --sidebar-w:240px; --topbar-h:60px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-body);background:var(--page);color:var(--surface-text);min-height:100vh;font-size:var(--text-base);line-height:1.5;}
+
+/* ── Screen Nav ── */
+.screen-nav{
+  position:sticky;top:0;z-index:1000;
+  display:flex;align-items:center;gap:0;
+  background:var(--page);border-bottom:1px solid var(--surface-border);
+  padding:0 20px; height:48px;
+}
+.screen-nav-brand{
+  font-family:var(--font-display);font-size:15px;font-weight:800;
+  background:linear-gradient(135deg,var(--brand-400),var(--accent-400));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-right:20px;white-space:nowrap;
+}
+.screen-tabs{display:flex;gap:2px;}
+.s-tab{
+  padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;
+  cursor:pointer;border:none;background:transparent;color:var(--surface-muted);
+  transition:all var(--dur-fast);white-space:nowrap;
+}
+.s-tab:hover{color:var(--surface-text);background:var(--surface-subtle);}
+.s-tab.active{color:#fff;background:rgba(99,102,241,.25);border:1px solid rgba(99,102,241,.3);}
+.screen-badge{
+  margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--surface-muted);white-space:nowrap;
+}
+
+/* ── Screen Wrapper ── */
+.screen{display:none;min-height:calc(100vh - 48px);}
+.screen.active{display:block;}
+.screen-label{
+  padding:16px 24px 0;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--brand-400);
+  margin-bottom:12px;
+}
+
+/* ═══════════════════════════════════════
+   SHARED APP SHELL
+═══════════════════════════════════════ */
+.app-shell{
+  display:grid;
+  grid-template-columns:var(--sidebar-w) 1fr;
+  grid-template-rows:var(--topbar-h) 1fr;
+  height:calc(100vh - 48px);
+}
+
+/* Topbar */
+.topbar{
+  grid-column:1/-1;
+  display:flex;align-items:center;
+  background:var(--surface-raised);
+  border-bottom:1px solid var(--surface-border);
+  padding:0;
+  position:relative;z-index:50;
+}
+.topbar-logo-zone{
+  width:var(--sidebar-w);display:flex;align-items:center;
+  padding:0 var(--space-4);height:100%;
+  border-right:1px solid var(--surface-border);flex-shrink:0;
+}
+.topbar-brand{
+  font-family:var(--font-display);font-size:17px;font-weight:800;
+  background:linear-gradient(135deg,var(--brand-400),var(--accent-400));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.topbar-center{flex:1;display:flex;align-items:center;padding:0 var(--space-5);}
+.search-bar{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:8px 14px;border-radius:var(--radius-md);
+  background:var(--surface-overlay);
+  border:1px solid var(--surface-border);
+  font-size:13px;color:var(--surface-muted);
+  width:320px;cursor:text;transition:border-color var(--dur-fast);
+}
+.search-bar:hover{border-color:rgb(var(--fg) / .14);}
+.search-shortcut{
+  margin-left:auto;font-size:11px;font-family:var(--font-mono);
+  background:var(--surface-subtle);padding:2px 6px;
+  border-radius:4px;color:var(--surface-muted);
+}
+.topbar-right{display:flex;align-items:center;gap:var(--space-2);padding:0 var(--space-4);}
+.icon-btn{
+  width:34px;height:34px;border-radius:var(--radius-sm);border:none;cursor:pointer;
+  background:transparent;color:var(--surface-muted);font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all var(--dur-fast);position:relative;
+}
+.icon-btn:hover{background:var(--surface-subtle);color:var(--surface-text);}
+.notif-badge{
+  position:absolute;top:4px;right:4px;width:7px;height:7px;
+  border-radius:50%;background:var(--danger-500);
+  border:1.5px solid var(--surface-raised);
+}
+.topbar-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--brand-500),var(--accent-500));
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;cursor:pointer;
+  border:2px solid var(--surface-border);
+  transition:border-color var(--dur-fast);
+}
+.topbar-avatar:hover{border-color:var(--brand-500);}
+
+/* Topbar breadcrumb */
+.topbar-breadcrumb{
+  display:flex;align-items:center;gap:var(--space-2);
+  font-size:13px;color:var(--surface-muted);margin-left:var(--space-4);
+}
+.breadcrumb-sep{color:rgb(var(--fg) / .2);}
+.breadcrumb-current{color:var(--surface-text);font-weight:600;}
+
+/* Sidebar */
+.sidebar{
+  grid-row:2;background:var(--surface-raised);
+  border-right:1px solid var(--surface-border);
+  display:flex;flex-direction:column;overflow-y:auto;
+  padding:var(--space-3) var(--space-2);
+}
+.sidebar-section{margin-bottom:var(--space-4);}
+.sidebar-label{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--surface-muted);padding:var(--space-2) var(--space-2) var(--space-1);
+}
+.sidebar-item{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:7px var(--space-2);border-radius:var(--radius-sm);
+  font-size:13px;font-weight:500;color:var(--surface-muted);
+  cursor:pointer;transition:all var(--dur-fast);
+  text-decoration:none;position:relative;
+}
+.sidebar-item:hover{background:var(--surface-subtle);color:var(--surface-text);}
+.sidebar-item.active{
+  background:rgba(99,102,241,.12);color:var(--brand-300);font-weight:600;
+}
+.sidebar-item.active::before{
+  content:'';position:absolute;left:0;top:25%;bottom:25%;
+  width:2.5px;border-radius:2px;background:var(--brand-500);
+}
+.s-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+.s-count{
+  margin-left:auto;font-size:11px;font-weight:700;
+  background:var(--danger-500);color:#fff;
+  padding:1px 5px;border-radius:var(--radius-full);min-width:16px;text-align:center;
+}
+.s-count.muted{background:var(--surface-subtle);color:var(--surface-muted);}
+
+/* Workspace chip */
+.ws-chip{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:8px var(--space-2);border-radius:var(--radius-sm);
+  background:var(--surface-overlay);border:1px solid var(--surface-border);
+  cursor:pointer;margin-bottom:var(--space-2);
+  transition:border-color var(--dur-fast);
+}
+.ws-chip:hover{border-color:rgba(99,102,241,.3);}
+.ws-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
+.ws-name{font-size:12px;font-weight:700;color:var(--surface-text);}
+.ws-type{font-size:11px;color:var(--surface-muted);}
+.ws-chevron{margin-left:auto;font-size:11px;color:var(--surface-muted);}
+
+/* Project item in sidebar */
+.proj-item{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:6px var(--space-2);border-radius:var(--radius-sm);
+  font-size:12px;font-weight:500;color:var(--surface-muted);
+  cursor:pointer;transition:all var(--dur-fast);
+}
+.proj-item:hover{background:var(--surface-subtle);color:var(--surface-text);}
+.proj-item.active{color:var(--surface-text);}
+.proj-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+
+.sidebar-divider{height:1px;background:var(--surface-border);margin:var(--space-2) var(--space-1);}
+.sidebar-footer{margin-top:auto;padding-top:var(--space-2);}
+.sidebar-add{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:6px var(--space-2);border-radius:var(--radius-sm);
+  font-size:12px;color:var(--surface-faint);
+  cursor:pointer;transition:all var(--dur-fast);
+}
+.sidebar-add:hover{background:var(--surface-subtle);color:var(--surface-muted);}
+
+/* Main area */
+.main{grid-row:2;background:var(--surface-base);overflow-y:auto;position:relative;}
+
+/* ─────────────────────────────────────
+   UTILITY
+───────────────────────────────────── */
+.flex{display:flex;}.flex-col{flex-direction:column;}
+.items-center{align-items:center;}.justify-between{justify-content:space-between;}
+.gap-1{gap:4px;}.gap-2{gap:8px;}.gap-3{gap:12px;}.gap-4{gap:16px;}
+.ml-auto{margin-left:auto;}
+.text-muted{color:var(--surface-muted);}
+.text-sm{font-size:12px;}.text-xs{font-size:11px;}
+.font-bold{font-weight:700;}.font-semibold{font-weight:600;}
+.badge{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 8px;border-radius:var(--radius-full);
+  font-size:11px;font-weight:700;line-height:1.4;
+}
+.badge-brand  {background:rgba(99,102,241,.18);color:var(--brand-300);}
+.badge-success{background:rgba(16,185,129,.15);color:#34d399;}
+.badge-warning{background:rgba(245,158,11,.15);color:#fbbf24;}
+.badge-danger {background:rgba(244,63,94,.15);color:#fb7185;}
+.badge-violet {background:rgba(139,92,246,.15);color:var(--accent-400);}
+.badge-gray   {background:var(--surface-subtle);color:var(--surface-muted);}
+.priority{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 7px;border-radius:4px;
+  font-size:11px;font-weight:700;letter-spacing:.04em;
+}
+.p-urgent{background:rgba(244,63,94,.12);color:#fb7185;border-left:2px solid #fb7185;}
+.p-high  {background:rgba(245,158,11,.12);color:#fbbf24;border-left:2px solid #fbbf24;}
+.p-medium{background:rgba(99,102,241,.12);color:var(--brand-300);border-left:2px solid var(--brand-400);}
+.p-low   {background:rgba(16,185,129,.10);color:#34d399;border-left:2px solid #34d399;}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:var(--radius-md);
+  font-size:13px;font-weight:600;font-family:var(--font-body);
+  cursor:pointer;border:none;transition:all var(--dur-normal) var(--ease-out);
+  line-height:1;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--brand-600),var(--accent-600));
+  color:#fff;box-shadow:var(--shadow-brand);
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-brand-lg);}
+.btn-ghost{background:transparent;color:var(--surface-muted);border:1px solid var(--surface-border);}
+.btn-ghost:hover{background:var(--surface-subtle);color:var(--surface-text);}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:var(--radius-sm);}
+.btn-icon{padding:7px;border-radius:var(--radius-sm);}
+.avatar{
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:700;color:#fff;flex-shrink:0;
+  background:linear-gradient(135deg,var(--brand-500),var(--accent-500));
+}
+.progress-bar{height:4px;background:var(--surface-subtle);border-radius:var(--radius-full);overflow:hidden;}
+.progress-fill{height:100%;border-radius:var(--radius-full);}
+.p-fill-brand  {background:linear-gradient(90deg,var(--brand-500),var(--accent-500));}
+.p-fill-success{background:var(--success-500);}
+.p-fill-warning{background:var(--warning-500);}
+.card{
+  background:var(--surface-raised);border:1px solid var(--surface-border);
+  border-radius:var(--radius-lg);
+}
+.card:hover{border-color:rgba(99,102,241,.2);}
+.input{
+  padding:9px 12px;border-radius:var(--radius-md);
+  border:1.5px solid var(--surface-border);
+  background:var(--surface-overlay);color:var(--surface-text);
+  font-size:13px;font-family:var(--font-body);outline:none;
+  transition:border-color var(--dur-fast),box-shadow var(--dur-fast);
+}
+.input:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(99,102,241,.15);}
+.input::placeholder{color:var(--surface-muted);}
+.toggle{
+  position:relative;width:42px;height:23px;cursor:pointer;
+  display:inline-flex;align-items:center;
+}
+.toggle input{opacity:0;position:absolute;}
+.toggle-track{
+  width:100%;height:100%;border-radius:var(--radius-full);
+  background:var(--surface-subtle);border:1px solid var(--surface-border);
+  transition:background var(--dur-normal);
+}
+.toggle input:checked~.toggle-track{background:var(--brand-600);border-color:var(--brand-600);}
+.toggle-thumb{
+  position:absolute;width:17px;height:17px;border-radius:50%;
+  background:#fff;box-shadow:var(--shadow-sm);left:3px;
+  transition:left var(--dur-normal) var(--ease-spring);
+}
+.toggle input:checked~.toggle-thumb{left:22px;}
+.skeleton{
+  background:linear-gradient(90deg,var(--surface-subtle) 25%,rgb(var(--fg) / .07) 50%,var(--surface-subtle) 75%);
+  background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:4px;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.divider{height:1px;background:var(--surface-border);}
+
+/* ═══════════════════════════════════════
+   SCREEN 1 — AUTH
+═══════════════════════════════════════ */
+.auth-shell{
+  min-height:calc(100vh - 48px);
+  background:var(--surface-base);
+  display:flex;align-items:center;justify-content:center;
+  padding:var(--space-8);
+  position:relative;overflow:hidden;
+}
+/* Background orbs */
+.auth-shell::before{
+  content:'';position:absolute;top:-120px;left:-80px;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,.12) 0%,transparent 65%);
+  pointer-events:none;
+}
+.auth-shell::after{
+  content:'';position:absolute;bottom:-100px;right:-60px;
+  width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,.1) 0%,transparent 65%);
+  pointer-events:none;
+}
+.auth-wrap{
+  display:grid;grid-template-columns:1fr 1fr;
+  width:100%;max-width:960px;border-radius:var(--radius-xl);
+  overflow:hidden;box-shadow:var(--shadow-xl);
+  border:1px solid var(--surface-border);
+  position:relative;z-index:1;
+}
+
+/* Auth left */
+.auth-left{
+  background:linear-gradient(155deg,#1a1540 0%,#0f0f2e 50%,#130d2a 100%);
+  padding:48px 44px;display:flex;flex-direction:column;
+  justify-content:space-between;position:relative;overflow:hidden;
+}
+.auth-left-glow1{
+  position:absolute;top:-60px;right:-60px;
+  width:260px;height:260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,.3) 0%,transparent 70%);
+}
+.auth-left-glow2{
+  position:absolute;bottom:-40px;left:-40px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,.2) 0%,transparent 70%);
+}
+.auth-brand-mark{position:relative;z-index:1;}
+.auth-brand-name{
+  font-family:var(--font-display);font-size:24px;font-weight:800;
+  background:linear-gradient(135deg,#a5b4fc,#c4b5fd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.auth-brand-tag{font-size:12px;color:rgb(var(--fg) / .35);margin-top:3px;}
+.auth-hero{position:relative;z-index:1;}
+.auth-hero h2{
+  font-family:var(--font-display);font-size:28px;font-weight:800;
+  color:#fff;line-height:1.25;margin-bottom:14px;
+}
+.auth-hero h2 span{
+  background:linear-gradient(135deg,var(--brand-300),var(--accent-400));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.auth-hero p{font-size:13px;color:rgb(var(--fg) / .5);line-height:1.7;}
+.auth-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px;}
+.auth-pill{
+  padding:5px 12px;border-radius:var(--radius-full);font-size:11px;font-weight:500;
+  background:rgb(var(--fg) / .07);color:rgb(var(--fg) / .65);
+  border:1px solid rgb(var(--fg) / .1);
+}
+.auth-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative;z-index:1;}
+.auth-stat-val{
+  font-family:var(--font-display);font-size:28px;font-weight:800;
+  background:linear-gradient(135deg,var(--brand-300),var(--accent-400));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.auth-stat-label{font-size:11px;color:rgb(var(--fg) / .35);margin-top:2px;}
+
+/* Auth right */
+.auth-right{
+  background:var(--surface-raised);padding:48px 44px;
+  display:flex;flex-direction:column;justify-content:center;
+}
+.auth-tab-row{
+  display:flex;background:var(--surface-overlay);
+  border-radius:var(--radius-md);padding:3px;
+  width:fit-content;margin-bottom:32px;
+  border:1px solid var(--surface-border);
+}
+.auth-tab{
+  padding:7px 22px;border-radius:8px;font-size:13px;font-weight:500;
+  cursor:pointer;border:none;background:transparent;
+  color:var(--surface-muted);transition:all var(--dur-fast);
+  font-family:var(--font-body);
+}
+.auth-tab.active{background:var(--brand-600);color:#fff;font-weight:600;box-shadow:var(--shadow-brand);}
+.auth-title{font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--surface-text);margin-bottom:4px;}
+.auth-sub{font-size:13px;color:var(--surface-muted);margin-bottom:28px;}
+.form-field{margin-bottom:16px;}
+.form-label{font-size:12px;font-weight:600;color:rgb(var(--fg) / .65);display:block;margin-bottom:6px;}
+.form-input{
+  width:100%;padding:10px 13px;border-radius:var(--radius-md);
+  border:1.5px solid var(--surface-border);
+  background:var(--surface-overlay);color:var(--surface-text);
+  font-size:14px;font-family:var(--font-body);outline:none;
+  transition:border-color var(--dur-fast),box-shadow var(--dur-fast);
+}
+.form-input:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(99,102,241,.15);}
+.form-input.focused{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(99,102,241,.15);}
+.form-input::placeholder{color:var(--surface-muted);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.auth-persona-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.auth-persona-card{
+  padding:12px 8px;border-radius:var(--radius-md);
+  border:1.5px solid var(--surface-border);
+  background:var(--surface-overlay);cursor:pointer;text-align:center;
+  transition:all var(--dur-fast);
+}
+.auth-persona-card:hover{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.06);}
+.auth-persona-card.selected{border-color:var(--brand-500);background:rgba(99,102,241,.1);}
+.persona-emoji{font-size:20px;margin-bottom:4px;}
+.persona-name{font-size:11px;font-weight:600;color:var(--surface-muted);}
+.auth-persona-card.selected .persona-name{color:var(--brand-300);}
+.auth-btn{
+  width:100%;padding:12px;border-radius:var(--radius-md);
+  background:linear-gradient(135deg,var(--brand-600),var(--accent-600));
+  color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;
+  font-family:var(--font-body);box-shadow:var(--shadow-brand);
+  transition:all var(--dur-normal) var(--ease-out);
+}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-brand-lg);}
+.auth-divider{
+  display:flex;align-items:center;gap:12px;
+  margin:18px 0;color:var(--surface-muted);font-size:12px;
+}
+.auth-divider::before,.auth-divider::after{
+  content:'';flex:1;height:1px;background:var(--surface-border);
+}
+.auth-google{
+  width:100%;padding:10px;border-radius:var(--radius-md);
+  border:1.5px solid var(--surface-border);background:var(--surface-overlay);
+  color:var(--surface-text);font-size:13px;font-weight:500;
+  cursor:pointer;font-family:var(--font-body);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:border-color var(--dur-fast);
+}
+.auth-google:hover{border-color:rgb(var(--fg) / .18);}
+.auth-footer{
+  margin-top:24px;text-align:center;
+  font-size:12px;color:var(--surface-muted);
+}
+.auth-footer a{color:var(--brand-400);font-weight:600;text-decoration:none;}
+.auth-footer a:hover{color:var(--brand-300);}
+.auth-forgot{font-size:12px;color:var(--brand-400);text-decoration:none;font-weight:500;}
+.auth-forgot:hover{color:var(--brand-300);}
+/* password eye */
+.input-wrap{position:relative;}
+.input-eye{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:14px;cursor:pointer;color:var(--surface-muted);
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 2 — DASHBOARD
+═══════════════════════════════════════ */
+.dash-content{padding:var(--space-8) var(--space-10);overflow-y:auto;height:100%;}
+.dash-greeting{
+  font-family:var(--font-display);font-size:22px;font-weight:800;
+  color:var(--surface-text);margin-bottom:4px;
+}
+.dash-date{font-size:13px;color:var(--surface-muted);margin-bottom:28px;}
+/* Stat cards */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{
+  padding:18px 20px;border-radius:var(--radius-lg);
+  background:var(--surface-raised);border:1px solid var(--surface-border);
+  position:relative;overflow:hidden;
+  transition:border-color var(--dur-normal),transform var(--dur-normal) var(--ease-out);
+}
+.stat-card:hover{border-color:rgba(99,102,241,.25);transform:translateY(-2px);}
+.stat-card-accent{position:absolute;top:0;left:0;right:0;height:2px;}
+.stat-label{font-size:11px;font-weight:600;color:var(--surface-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.stat-value{font-family:var(--font-display);font-size:30px;font-weight:800;color:var(--surface-text);line-height:1;}
+.stat-sub{font-size:11px;color:var(--surface-muted);margin-top:6px;display:flex;align-items:center;gap:4px;}
+.trend-up{color:var(--success-500);}.trend-down{color:var(--danger-500);}
+/* Two column */
+.dash-cols{display:grid;grid-template-columns:1fr 320px;gap:16px;}
+/* Card panel */
+.panel{background:var(--surface-raised);border:1px solid var(--surface-border);border-radius:var(--radius-lg);overflow:hidden;}
+.panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--surface-border);
+}
+.panel-title{font-size:13px;font-weight:700;color:var(--surface-text);}
+.panel-action{font-size:12px;color:var(--brand-400);cursor:pointer;font-weight:500;}
+.panel-action:hover{color:var(--brand-300);}
+/* Task list */
+.task-item{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 18px;border-bottom:1px solid rgb(var(--fg) / .04);
+  transition:background var(--dur-fast);cursor:pointer;
+}
+.task-item:last-child{border-bottom:none;}
+.task-item:hover{background:var(--surface-subtle);}
+.task-check{
+  width:17px;height:17px;border-radius:5px;flex-shrink:0;
+  border:1.5px solid var(--surface-border);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all var(--dur-fast);
+}
+.task-check.done{background:var(--brand-600);border-color:var(--brand-600);}
+.task-check.done::after{content:'✓';font-size:11px;color:#fff;font-weight:700;}
+.task-text{font-size:13px;color:var(--surface-text);flex:1;line-height:1.35;}
+.task-text.done{text-decoration:line-through;color:var(--surface-muted);}
+.task-due{font-size:11px;color:var(--surface-muted);white-space:nowrap;}
+.task-due.overdue{color:var(--danger-500);font-weight:600;}
+/* Project cards */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;}
+.proj-card{
+  padding:13px;border-radius:var(--radius-md);
+  border:1px solid var(--surface-border);background:var(--surface-overlay);
+  cursor:pointer;transition:all var(--dur-fast);
+}
+.proj-card:hover{border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.05);}
+.proj-card-top{display:flex;align-items:center;gap:7px;margin-bottom:10px;}
+.proj-dot-box{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.proj-name{font-size:12px;font-weight:700;color:var(--surface-text);}
+.proj-type{font-size:11px;color:var(--surface-muted);}
+/* Heatmap */
+.heatmap-wrap{padding:16px;}
+.heatmap-grid{display:flex;gap:3px;}
+.hm-col{display:flex;flex-direction:column;gap:3px;}
+.hm-cell{width:11px;height:11px;border-radius:2px;background:var(--surface-subtle);}
+.hm-1{background:rgba(99,102,241,.2);}
+.hm-2{background:rgba(99,102,241,.45);}
+.hm-3{background:rgba(99,102,241,.7);}
+.hm-4{background:var(--brand-500);}
+/* Quick capture */
+.qc-wrap{padding:14px;}
+.qc-textarea{
+  width:100%;padding:10px 12px;border-radius:var(--radius-md);
+  border:1.5px solid var(--surface-border);background:var(--surface-overlay);
+  color:var(--surface-text);font-size:13px;font-family:var(--font-body);
+  resize:none;outline:none;height:72px;line-height:1.5;
+  transition:border-color var(--dur-fast);
+}
+.qc-textarea::placeholder{color:var(--surface-muted);}
+.qc-textarea:focus{border-color:var(--brand-500);}
+/* Recent notes */
+.note-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 18px;border-bottom:1px solid rgb(var(--fg) / .04);
+  cursor:pointer;transition:background var(--dur-fast);
+}
+.note-item:hover{background:var(--surface-subtle);}
+.note-item:last-child{border-bottom:none;}
+.note-title{font-size:13px;color:var(--surface-text);flex:1;}
+.note-time{font-size:11px;color:var(--surface-muted);}
+
+/* ═══════════════════════════════════════
+   SCREEN 3 — KANBAN BOARD
+═══════════════════════════════════════ */
+.board-topbar-extra{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:0 var(--space-5);margin-left:auto;
+}
+.view-toggle{
+  display:flex;background:var(--surface-overlay);border-radius:var(--radius-sm);
+  padding:3px;border:1px solid var(--surface-border);gap:2px;
+}
+.view-btn{
+  padding:5px 10px;border-radius:5px;font-size:11px;font-weight:600;
+  cursor:pointer;border:none;background:transparent;color:var(--surface-muted);
+  transition:all var(--dur-fast);font-family:var(--font-body);
+}
+.view-btn.active{background:var(--brand-600);color:#fff;}
+.board-main{height:100%;display:flex;flex-direction:column;overflow:hidden;}
+.board-header{
+  padding:18px var(--space-5) 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;border-bottom:1px solid var(--surface-border);
+}
+.board-title{font-family:var(--font-display);font-size:18px;font-weight:800;color:var(--surface-text);}
+.board-meta{font-size:12px;color:var(--surface-muted);margin-top:2px;}
+.board-actions{display:flex;align-items:center;gap:var(--space-2);}
+.filter-chip{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px;border-radius:var(--radius-full);
+  font-size:11px;font-weight:500;color:var(--surface-muted);
+  background:var(--surface-overlay);border:1px solid var(--surface-border);
+  cursor:pointer;transition:all var(--dur-fast);
+}
+.filter-chip:hover{border-color:rgba(99,102,241,.3);color:var(--brand-300);}
+.filter-chip.active{border-color:var(--brand-500);color:var(--brand-300);background:rgba(99,102,241,.08);}
+/* Columns */
+.board-scroll{flex:1;overflow-x:auto;overflow-y:hidden;padding:18px var(--space-5) var(--space-5);}
+.board-cols{display:flex;gap:14px;height:100%;align-items:flex-start;}
+.kanban-col{
+  width:272px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  background:var(--surface-overlay);
+  border-radius:var(--radius-lg);border:1px solid var(--surface-border);
+  max-height:calc(100% - 4px);
+}
+.kanban-col-header{
+  padding:12px 14px;display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--surface-border);flex-shrink:0;
+  position:relative;
+}
+.kanban-col-header::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2.5px;
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+}
+.col-todo .kanban-col-header::before{background:var(--surface-muted);}
+.col-progress .kanban-col-header::before{background:var(--brand-500);}
+.col-review .kanban-col-header::before{background:var(--warning-500);}
+.col-done .kanban-col-header::before{background:var(--success-500);}
+.col-title{font-size:12px;font-weight:700;color:var(--surface-text);}
+.col-count{
+  font-size:11px;font-weight:700;padding:1px 6px;
+  border-radius:var(--radius-full);background:var(--surface-subtle);color:var(--surface-muted);
+}
+.col-add{margin-left:auto;font-size:16px;color:var(--surface-muted);cursor:pointer;line-height:1;transition:color var(--dur-fast);}
+.col-add:hover{color:var(--surface-text);}
+.kanban-col-body{padding:10px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;}
+/* Kanban card */
+.k-card{
+  background:var(--surface-raised);border:1px solid var(--surface-border);
+  border-radius:var(--radius-md);padding:12px;cursor:grab;
+  transition:all var(--dur-normal) var(--ease-out);
+  position:relative;
+}
+.k-card:hover{border-color:rgba(99,102,241,.3);transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.k-card.dragging{opacity:.5;transform:scale(.98);box-shadow:var(--shadow-lg);}
+.k-card-accent{
+  position:absolute;left:0;top:0;bottom:0;width:2.5px;
+  border-radius:var(--radius-md) 0 0 var(--radius-md);
+}
+.k-card-inner{padding-left:8px;}
+.k-card-title{font-size:13px;font-weight:600;color:var(--surface-text);line-height:1.4;margin-bottom:8px;}
+.k-card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.k-card-footer{display:flex;align-items:center;justify-content:space-between;}
+.k-card-due{font-size:11px;color:var(--surface-muted);}
+.k-card-due.over{color:var(--danger-500);font-weight:600;}
+.k-avatar{width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand-500),var(--accent-500));}
+/* Add card placeholder */
+.add-card{
+  padding:10px;border-radius:var(--radius-md);
+  border:1px dashed rgb(var(--fg) / .1);color:var(--surface-muted);
+  font-size:12px;cursor:pointer;text-align:center;
+  transition:all var(--dur-fast);
+}
+.add-card:hover{border-color:rgba(99,102,241,.3);color:var(--brand-400);background:rgba(99,102,241,.04);}
+/* Add column */
+.add-col{
+  width:248px;flex-shrink:0;
+  padding:14px;border-radius:var(--radius-lg);
+  border:1.5px dashed rgb(var(--fg) / .08);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;cursor:pointer;transition:all var(--dur-fast);color:var(--surface-muted);
+  font-size:13px;height:80px;
+}
+.add-col:hover{border-color:rgba(99,102,241,.3);color:var(--brand-400);background:rgba(99,102,241,.03);}
+
+/* Card Slide-Over */
+.slideover-backdrop{
+  position:absolute;inset:0;background:rgba(0,0,0,.4);
+  backdrop-filter:blur(2px);z-index:40;
+}
+.slideover{
+  position:absolute;top:0;right:0;bottom:0;
+  width:52%;background:var(--surface-raised);
+  border-left:1px solid var(--surface-border);
+  z-index:50;display:flex;flex-direction:column;
+  box-shadow:-8px 0 32px rgba(0,0,0,.25);
+}
+.slideover-header{
+  padding:18px 22px;border-bottom:1px solid var(--surface-border);
+  display:flex;align-items:flex-start;gap:12px;flex-shrink:0;
+}
+.slideover-close{
+  width:28px;height:28px;border-radius:var(--radius-sm);
+  background:var(--surface-subtle);border:none;cursor:pointer;
+  color:var(--surface-muted);font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all var(--dur-fast);
+}
+.slideover-close:hover{background:rgba(244,63,94,.15);color:var(--danger-500);}
+.slideover-title-input{
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:var(--font-display);font-size:18px;font-weight:800;
+  color:var(--surface-text);resize:none;line-height:1.3;
+}
+.slideover-meta{
+  display:flex;align-items:center;gap:var(--space-3);
+  padding:12px 22px;border-bottom:1px solid var(--surface-border);
+  flex-shrink:0;flex-wrap:wrap;
+}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:12px;}
+.meta-label{color:var(--surface-muted);font-weight:500;}
+.meta-val{color:var(--surface-text);font-weight:600;}
+.slideover-body{flex:1;overflow-y:auto;padding:20px 22px;}
+.editor-toolbar{
+  display:flex;align-items:center;gap:2px;flex-wrap:wrap;
+  padding:8px 10px;border-radius:var(--radius-md);
+  background:var(--surface-overlay);border:1px solid var(--surface-border);
+  margin-bottom:14px;
+}
+.toolbar-btn{
+  width:28px;height:28px;border-radius:5px;border:none;cursor:pointer;
+  background:transparent;color:var(--surface-muted);font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  transition:all var(--dur-fast);font-family:var(--font-body);
+}
+.toolbar-btn:hover{background:var(--surface-subtle);color:var(--surface-text);}
+.toolbar-btn.active{background:rgba(99,102,241,.2);color:var(--brand-300);}
+.toolbar-sep{width:1px;height:18px;background:var(--surface-border);margin:0 4px;}
+.editor-area{
+  min-height:240px;font-size:14px;line-height:1.75;color:rgb(var(--fg) / .75);
+}
+.editor-area p{margin-bottom:10px;}
+.editor-area h3{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--surface-text);margin:16px 0 8px;}
+.editor-area ul{padding-left:18px;margin-bottom:10px;}
+.editor-area li{margin-bottom:4px;}
+.editor-area code{font-family:var(--font-mono);font-size:12px;background:var(--surface-overlay);padding:1px 5px;border-radius:3px;color:var(--brand-300);}
+.slideover-footer{
+  padding:12px 22px;border-top:1px solid var(--surface-border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 4 — NOTE EDITOR
+═══════════════════════════════════════ */
+.notes-shell{
+  display:grid;grid-template-columns:220px 1fr;
+  height:100%;
+}
+.notes-sidebar{
+  background:var(--surface-raised);border-right:1px solid var(--surface-border);
+  display:flex;flex-direction:column;padding:14px 10px;overflow-y:auto;
+}
+.notes-sidebar-title{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--surface-muted);padding:4px 6px 8px;
+}
+.folder-item{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 8px;border-radius:var(--radius-sm);
+  font-size:12px;font-weight:500;color:var(--surface-muted);
+  cursor:pointer;transition:all var(--dur-fast);
+}
+.folder-item:hover{background:var(--surface-subtle);color:var(--surface-text);}
+.folder-item.active{background:rgba(99,102,241,.1);color:var(--brand-300);}
+.folder-icon{font-size:13px;width:16px;text-align:center;}
+.folder-sub{padding-left:22px;}
+.note-list-item{
+  display:flex;flex-direction:column;gap:2px;
+  padding:8px 8px;border-radius:var(--radius-sm);
+  cursor:pointer;transition:all var(--dur-fast);
+  border:1px solid transparent;margin-bottom:2px;
+}
+.note-list-item:hover{background:var(--surface-subtle);}
+.note-list-item.active{background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.2);}
+.note-list-title{font-size:12px;font-weight:600;color:var(--surface-text);}
+.note-list-preview{font-size:11px;color:var(--surface-muted);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.note-list-meta{font-size:11px;color:var(--surface-faint);margin-top:2px;}
+/* Editor main */
+.note-editor-main{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.note-editor-topbar{
+  padding:12px 32px;border-bottom:1px solid var(--surface-border);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.note-breadcrumb{font-size:12px;color:var(--surface-muted);}
+.note-breadcrumb span{color:var(--surface-text);font-weight:600;}
+.note-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.note-status{font-size:11px;color:var(--surface-muted);font-style:italic;}
+.note-editor-body{flex:1;overflow-y:auto;padding:40px 80px;}
+.note-title-input{
+  font-family:var(--font-display);font-size:34px;font-weight:800;
+  color:var(--surface-text);border:none;outline:none;background:transparent;
+  width:100%;margin-bottom:10px;line-height:1.2;resize:none;
+}
+.note-tags-row{display:flex;align-items:center;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.note-tag-chip{
+  padding:3px 10px;border-radius:var(--radius-full);
+  font-size:11px;font-weight:600;
+  background:rgba(99,102,241,.1);color:var(--brand-400);
+  border:1px solid rgba(99,102,241,.2);cursor:pointer;
+}
+.note-tag-add{
+  padding:3px 10px;border-radius:var(--radius-full);
+  font-size:11px;color:var(--surface-muted);cursor:pointer;
+  border:1px dashed rgb(var(--fg) / .1);
+}
+.note-tag-add:hover{border-color:rgba(99,102,241,.3);color:var(--brand-400);}
+.note-divider-line{height:1px;background:var(--surface-border);margin-bottom:28px;}
+.note-body{font-size:15px;line-height:1.8;color:rgb(var(--fg) / .72);}
+.note-body h2{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--surface-text);margin:28px 0 12px;}
+.note-body h3{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--surface-text);margin:20px 0 8px;}
+.note-body p{margin-bottom:14px;}
+.note-body ul,.note-body ol{padding-left:22px;margin-bottom:14px;}
+.note-body li{margin-bottom:6px;}
+.note-body code{font-family:var(--font-mono);font-size:13px;background:var(--surface-overlay);padding:2px 6px;border-radius:4px;color:var(--brand-300);}
+.note-body blockquote{
+  border-left:3px solid var(--brand-500);padding:10px 16px;
+  margin:16px 0;background:rgba(99,102,241,.05);border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  color:rgb(var(--fg) / .55);font-style:italic;
+}
+.note-cursor{
+  display:inline-block;width:2px;height:18px;background:var(--brand-500);
+  border-radius:1px;margin-left:1px;vertical-align:text-bottom;
+  animation:blink 1s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+/* Floating toolbar */
+.float-toolbar{
+  display:inline-flex;align-items:center;gap:2px;
+  padding:5px 8px;border-radius:var(--radius-md);
+  background:var(--surface-overlay);border:1px solid var(--surface-border);
+  box-shadow:var(--shadow-lg);margin:20px 0 10px;
+}
+.float-toolbar .toolbar-btn{width:26px;height:26px;font-size:11px;}
+
+/* Reference panel (researcher) */
+.ref-panel{
+  width:0;overflow:hidden;transition:width var(--dur-slow) var(--ease-out);
+  border-left:1px solid var(--surface-border);
+  background:var(--surface-raised);flex-shrink:0;
+}
+.ref-panel.open{width:260px;}
+.ref-inner{padding:16px;width:260px;}
+.ref-title{font-size:12px;font-weight:700;color:var(--surface-text);margin-bottom:14px;}
+.ref-item{
+  padding:10px;border-radius:var(--radius-sm);
+  background:var(--surface-overlay);border:1px solid var(--surface-border);
+  margin-bottom:8px;cursor:pointer;transition:border-color var(--dur-fast);
+}
+.ref-item:hover{border-color:rgba(99,102,241,.3);}
+.ref-item-title{font-size:11px;font-weight:600;color:var(--surface-text);line-height:1.4;margin-bottom:3px;}
+.ref-item-meta{font-size:11px;color:var(--surface-muted);}
+.note-editor-wrap{display:flex;flex:1;overflow:hidden;}
+
+/* ═══════════════════════════════════════
+   SCREEN 5 — SETTINGS
+═══════════════════════════════════════ */
+.settings-shell{
+  display:grid;grid-template-columns:220px 1fr;height:100%;
+}
+.settings-nav{
+  background:var(--surface-raised);border-right:1px solid var(--surface-border);
+  padding:20px 10px;overflow-y:auto;
+}
+.settings-nav-label{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--surface-muted);padding:6px 8px 4px;
+}
+.settings-nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:500;color:var(--surface-muted);
+  cursor:pointer;transition:all var(--dur-fast);margin-bottom:1px;
+}
+.settings-nav-item:hover{background:var(--surface-subtle);color:var(--surface-text);}
+.settings-nav-item.active{background:rgba(99,102,241,.1);color:var(--brand-300);font-weight:600;}
+.settings-nav-item.danger{color:rgba(244,63,94,.7);}
+.settings-nav-item.danger:hover{background:rgba(244,63,94,.08);color:var(--danger-500);}
+.settings-body{background:var(--surface-base);overflow-y:auto;padding:32px 40px;}
+.settings-page-title{font-family:var(--font-display);font-size:20px;font-weight:800;color:var(--surface-text);margin-bottom:4px;}
+.settings-page-sub{font-size:13px;color:var(--surface-muted);margin-bottom:28px;}
+.settings-block{
+  background:var(--surface-raised);border:1px solid var(--surface-border);
+  border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;
+}
+.settings-block-header{
+  padding:14px 20px;border-bottom:1px solid var(--surface-border);
+  font-size:13px;font-weight:700;color:var(--surface-text);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.settings-block-body{padding:20px;}
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:13px 0;border-bottom:1px solid rgb(var(--fg) / .04);
+}
+.settings-row:last-child{border-bottom:none;padding-bottom:0;}
+.settings-row:first-child{padding-top:0;}
+.settings-row-info{}
+.settings-row-label{font-size:13px;font-weight:600;color:var(--surface-text);margin-bottom:2px;}
+.settings-row-desc{font-size:11px;color:var(--surface-muted);}
+/* Avatar */
+.profile-avatar-zone{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
+.profile-avatar{
+  width:68px;height:68px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--brand-500),var(--accent-500));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:24px;font-weight:800;color:#fff;
+  border:2px solid var(--surface-border);
+}
+.avatar-btn-row{display:flex;flex-direction:column;gap:6px;}
+.avatar-btn{
+  padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;
+  cursor:pointer;border:1px solid var(--surface-border);background:var(--surface-overlay);
+  color:var(--surface-text);font-family:var(--font-body);transition:all var(--dur-fast);
+}
+.avatar-btn:hover{border-color:rgb(var(--fg) / .2);}
+.avatar-btn.danger{border-color:rgba(244,63,94,.2);color:var(--danger-500);}
+.avatar-btn.danger:hover{background:rgba(244,63,94,.06);}
+/* Form grid */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.s-input{
+  width:100%;padding:9px 12px;border-radius:var(--radius-md);
+  border:1.5px solid var(--surface-border);background:var(--surface-overlay);
+  color:var(--surface-text);font-size:13px;font-family:var(--font-body);outline:none;
+  transition:border-color var(--dur-fast);
+}
+.s-input:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
+.s-label{font-size:11px;font-weight:600;color:rgb(var(--fg) / .5);display:block;margin-bottom:5px;}
+.s-select{
+  width:160px;padding:7px 10px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--surface-border);background:var(--surface-overlay);
+  color:var(--surface-text);font-size:13px;font-family:var(--font-body);
+  outline:none;cursor:pointer;
+}
+.s-select:focus{border-color:var(--brand-500);}
+/* Persona selector */
+.persona-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.persona-card{
+  padding:14px 10px;border-radius:var(--radius-md);text-align:center;
+  border:1.5px solid var(--surface-border);background:var(--surface-overlay);
+  cursor:pointer;transition:all var(--dur-fast);
+}
+.persona-card:hover{border-color:rgba(99,102,241,.3);}
+.persona-card.active{border-color:var(--brand-500);background:rgba(99,102,241,.08);}
+.persona-card-icon{font-size:24px;margin-bottom:6px;}
+.persona-card-name{font-size:12px;font-weight:700;color:var(--surface-muted);}
+.persona-card.active .persona-card-name{color:var(--brand-300);}
+.persona-card-desc{font-size:11px;color:var(--surface-faint);margin-top:2px;}
+/* Workspace list */
+.ws-list-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid rgb(var(--fg) / .04);
+}
+.ws-list-item:last-child{border-bottom:none;}
+.ws-list-icon{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+}
+.ws-list-name{font-size:13px;font-weight:700;color:var(--surface-text);}
+.ws-list-meta{font-size:11px;color:var(--surface-muted);}
+.ws-list-badge{
+  font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;
+}
+.ws-badge-work    {background:rgba(99,102,241,.15);color:var(--brand-300);}
+.ws-badge-study   {background:rgba(16,185,129,.12);color:#34d399;}
+.ws-badge-research{background:rgba(139,92,246,.15);color:var(--accent-400);}
+/* Danger zone */
+.danger-zone{
+  background:rgba(244,63,94,.04);border:1px solid rgba(244,63,94,.15);
+  border-radius:var(--radius-lg);padding:18px;
+}
+.danger-zone-title{font-size:14px;font-weight:700;color:var(--danger-500);margin-bottom:4px;}
+.danger-zone-desc{font-size:12px;color:var(--surface-muted);margin-bottom:14px;line-height:1.6;}
+.btn-danger-outline{
+  padding:7px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;
+  background:transparent;color:var(--danger-500);border:1px solid rgba(244,63,94,.3);
+  cursor:pointer;font-family:var(--font-body);transition:all var(--dur-fast);margin-right:8px;
+}
+.btn-danger-outline:hover{background:rgba(244,63,94,.08);}
+.btn-danger-fill{
+  padding:7px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;
+  background:var(--danger-600);color:#fff;border:none;
+  cursor:pointer;font-family:var(--font-body);transition:all var(--dur-fast);
+}
+.btn-danger-fill:hover{background:var(--danger-500);}
+
+/* ─────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────── */
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:1ms!important;transition-duration:1ms!important;}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FIXES & ADDITIONS  (appended after the original design system)
+   ═══════════════════════════════════════════════════════════════ */
+
+[hidden]{display:none!important;}
+.mount{display:contents;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+html{color-scheme:dark;}
+html[data-theme="light"]{color-scheme:light;}
+
+/* ── Light theme (every colour in the design runs through --fg) ── */
+html[data-theme="light"]{
+  --fg:20 20 48;
+  --page:#e8eaf4;
+  --surface-base:#f4f5fb;
+  --surface-raised:#ffffff;
+  --surface-overlay:#eceef7;
+  --surface-border:rgb(var(--fg) / .12);
+  --surface-subtle:rgb(var(--fg) / .06);
+  --surface-muted:rgb(var(--fg) / .64);
+  --surface-faint:rgb(var(--fg) / .66);
+  --brand-300:#4338ca; --brand-400:#4f46e5;
+  --accent-400:#7c3aed;
+  --shadow-lg:0 8px 28px rgba(30,30,80,.12),0 4px 10px rgba(30,30,80,.06);
+  --shadow-xl:0 20px 50px rgba(30,30,80,.16),0 8px 20px rgba(30,30,80,.08);
+}
+html[data-theme="light"] .badge-success{color:#047857;}
+html[data-theme="light"] .badge-warning{color:#b45309;}
+html[data-theme="light"] .badge-danger{color:#be123c;}
+html[data-theme="light"] .badge-violet{color:#6d28d9;}
+html[data-theme="light"] .p-urgent{color:#be123c;}
+html[data-theme="light"] .p-high{color:#b45309;}
+html[data-theme="light"] .p-low{color:#047857;}
+html[data-theme="light"] .trend-up{color:#047857;}
+html[data-theme="light"] .trend-down{color:#be123c;}
+html[data-theme="light"] .ws-badge-study{color:#047857;}
+html[data-theme="light"] .ws-badge-research{color:#6d28d9;}
+html[data-theme="light"] .s-tab.active{color:var(--brand-700);}
+html[data-theme="light"] .task-due.overdue,
+html[data-theme="light"] .k-card-due.over{color:#be123c;}
+html[data-theme="light"] .toggle-thumb{box-shadow:0 1px 3px rgba(20,20,48,.35);}
+html[data-theme="light"] .slideover-backdrop{background:rgba(20,20,48,.28);}
+/* The brand panel on the sign-in screen stays dark in both themes */
+.auth-left{--fg:255 255 255;--surface-text:rgb(255 255 255 / .88);--surface-muted:rgb(255 255 255 / .62);}
+.auth-brand-tag,.auth-stat-label{color:rgb(255 255 255 / .62);}
+
+/* ── Visible keyboard focus everywhere ── */
+:where(button,[role="button"],[role="checkbox"],a,select,[tabindex]):focus-visible{outline:2px solid var(--brand-400);outline-offset:2px;}
+:where(input,textarea):focus-visible{outline:none;}
+.toggle input:focus-visible ~ .toggle-track{outline:2px solid var(--brand-400);outline-offset:2px;}
+.note-body:focus-visible,.editor-area:focus-visible{outline:none;}
+button:disabled{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none;}
+
+/* ── Elements converted from <div>/<span> to real buttons ── */
+button.search-bar{font-family:var(--font-body);text-align:left;cursor:pointer;}
+button.search-bar .search-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+button.search-bar:focus-visible{outline:2px solid var(--brand-400);outline-offset:2px;}
+button.topbar-avatar{padding:0;font-family:inherit;}
+button.input-eye{background:none;border:0;padding:4px;line-height:1;font-family:inherit;}
+button.input-eye[aria-pressed="true"]{color:var(--brand-400);}
+button.task-check{background:transparent;padding:0;font-family:inherit;}
+button.panel-action{background:none;border:0;padding:2px 0;font-family:inherit;font-size:12px;}
+button.col-add{background:none;border:0;padding:2px 6px;font-family:inherit;border-radius:var(--radius-sm);}
+button.add-card{background:none;font-family:inherit;width:100%;}
+button.add-col{background:none;font-family:inherit;}
+button.note-tag-add{background:none;font-family:inherit;}
+.input-wrap .form-input{padding-right:40px;}
+.search-bar{max-width:100%;}
+.s-tab{font-family:var(--font-body);}
+.s-tab:focus-visible{outline-offset:-2px;}
+.sidebar-item,.proj-item,.folder-item,.sidebar-add,.settings-nav-item{user-select:none;}
+.filter-chip,.view-btn{font-family:var(--font-body);}
+.filter-chip[aria-pressed="true"]{border-color:var(--brand-500);color:var(--brand-300);background:rgba(99,102,241,.08);}
+
+/* ── Form feedback ── */
+.form-error{font-size:12px;color:var(--danger-500);background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:12px;line-height:1.4;}
+html[data-theme="light"] .form-error{color:#be123c;}
+.form-input[aria-invalid="true"],.s-input[aria-invalid="true"]{border-color:var(--danger-500);}
+.s-input.s-select-wide{width:100%;}
+
+/* ── Empty states ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:48px 20px;color:var(--surface-muted);flex:1;}
+.empty-state .empty-ico{font-size:32px;}
+.empty-state p{font-size:14px;}
+.empty-note{padding:22px 18px;text-align:center;font-size:13px;color:var(--surface-muted);}
+.col-empty{padding:18px 8px;text-align:center;font-size:12px;color:var(--surface-muted);border:1px dashed var(--surface-border);border-radius:var(--radius-md);}
+
+/* ── Dashboard polish ── */
+.task-item{cursor:pointer;}
+.task-check:hover{border-color:var(--brand-400);}
+.task-item .task-text{min-width:0;}
+.proj-card{width:100%;text-align:left;}
+.proj-dot{transition:opacity var(--dur-fast);}
+body.hide-proj-colors .proj-dot{opacity:0;}
+.panel-flash{animation:panel-flash 1.1s var(--ease-out);}
+@keyframes panel-flash{0%{box-shadow:0 0 0 0 rgba(99,102,241,.6);}100%{box-shadow:0 0 0 14px rgba(99,102,241,0);}}
+.stat-sub{flex-wrap:wrap;}
+
+/* ── Kanban additions ── */
+.k-card{outline-offset:2px;}
+.k-card.is-done{opacity:.78;}
+.k-card.is-done .k-card-title{text-decoration:line-through;color:var(--surface-muted);}
+.kanban-col.drag-over{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(99,102,241,.16);}
+.col-custom .kanban-col-header::before{background:var(--accent-500);}
+.kanban-col-header .col-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.composer{display:flex;flex-direction:column;gap:8px;}
+.composer textarea,.composer input{width:100%;padding:9px 10px;border-radius:var(--radius-md);border:1.5px solid var(--surface-border);background:var(--surface-raised);color:var(--surface-text);font:inherit;font-size:13px;resize:none;outline:none;line-height:1.4;}
+.composer textarea:focus,.composer input:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(99,102,241,.15);}
+.composer-actions{display:flex;gap:6px;}
+.add-col.composer-col{height:auto;align-items:stretch;justify-content:flex-start;cursor:default;border-style:solid;}
+.board-scroll{scroll-snap-type:x proximity;}
+.kanban-col{scroll-snap-align:start;}
+
+/* List view */
+.list-view{flex:1;overflow:auto;padding:16px var(--space-5) var(--space-5);}
+.list-group{margin-bottom:20px;max-width:960px;}
+.list-group h3{font-size:12px;font-weight:700;display:flex;gap:8px;align-items:center;margin-bottom:8px;color:var(--surface-text);}
+.list-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:14px;align-items:center;width:100%;padding:10px 14px;border:1px solid var(--surface-border);border-bottom-width:0;background:var(--surface-raised);color:var(--surface-text);font:inherit;font-size:13px;text-align:left;cursor:pointer;transition:background var(--dur-fast);}
+.list-row:hover{background:var(--surface-overlay);}
+.list-group .list-row:first-of-type{border-radius:var(--radius-md) var(--radius-md) 0 0;}
+.list-group .list-row:last-child{border-bottom-width:1px;border-radius:0 0 var(--radius-md) var(--radius-md);}
+.list-group .list-row:only-child{border-radius:var(--radius-md);}
+.list-title{min-width:0;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-weight:600;}
+.list-row.is-done .list-title-text{text-decoration:line-through;color:var(--surface-muted);}
+.list-tags{display:inline-flex;gap:5px;flex-wrap:wrap;}
+
+/* Slide-over (card detail) */
+.slideover{max-width:100%;animation:so-in var(--dur-slow) var(--ease-out);}
+@keyframes so-in{from{transform:translateX(24px);opacity:0;}to{transform:none;opacity:1;}}
+.slideover-title-input{min-width:0;}
+.meta-select,.meta-input{background:var(--surface-overlay);border:1px solid var(--surface-border);color:var(--surface-text);font-family:var(--font-body);font-size:12px;font-weight:600;border-radius:var(--radius-full);padding:4px 10px;outline:none;}
+.meta-select{cursor:pointer;}
+.meta-input{width:96px;border-radius:var(--radius-sm);}
+.meta-input[data-over="true"]{color:var(--danger-500);}
+.meta-select:focus-visible,.meta-input:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px rgba(99,102,241,.15);}
+select.priority.meta-select{padding:4px 10px;border-radius:4px;}
+.so-tags{display:inline-flex;gap:4px;flex-wrap:wrap;}
+.meta-add{width:22px;height:22px;border-radius:50%;border:1px dashed var(--surface-border);background:none;color:var(--surface-muted);cursor:pointer;font-size:12px;line-height:1;}
+.meta-add:hover{color:var(--brand-400);border-color:var(--brand-500);}
+.so-foot-info{font-size:12px;color:var(--surface-muted);flex-wrap:wrap;}
+.so-foot-info [data-dirty="true"]{color:var(--warning-500);font-weight:600;}
+.editor-area{outline:none;}
+.editor-area:empty::before{content:attr(data-placeholder);color:var(--surface-faint);}
+.editor-area h2{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--surface-text);margin:16px 0 8px;}
+.editor-area ul.checklist,.note-body ul.checklist{list-style:none;padding-left:2px;}
+.editor-area input[type="checkbox"],.note-body input[type="checkbox"]{accent-color:var(--brand-600);margin-right:8px;width:14px;height:14px;vertical-align:-2px;}
+.editor-area a,.note-body a{color:var(--brand-400);}
+.toolbar-btn[aria-pressed="true"]{background:rgba(99,102,241,.2);color:var(--brand-300);}
+
+/* Notes */
+.notes-split{display:grid;grid-template-columns:240px minmax(0,1fr);height:100%;}
+.notes-list-panel{border-right:1px solid var(--surface-border);overflow-y:auto;padding:12px 8px;background:var(--surface-raised);}
+.note-list-item{width:100%;}
+.note-body{outline:none;min-height:40vh;}
+.note-body:empty::before{content:"Start writing…";color:var(--surface-faint);}
+.note-body pre{font-family:var(--font-mono);font-size:13px;background:var(--surface-overlay);padding:12px 14px;border-radius:var(--radius-sm);overflow-x:auto;margin-bottom:14px;}
+.note-title-input{overflow:hidden;}
+.note-tag-chip{display:inline-flex;align-items:center;gap:2px;}
+.note-tag-chip .chip-label{background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0;}
+.note-tag-chip .chip-x{background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0 0 0 4px;opacity:.65;line-height:1;}
+.note-tag-chip .chip-x:hover{opacity:1;color:var(--danger-500);}
+.note-editor-wrap{min-width:0;}
+.note-editor-main{min-width:0;flex:1;}
+.ref-panel:not(.open) .ref-inner{visibility:hidden;}
+.ref-item{width:100%;text-align:left;}
+.ref-toggle[aria-pressed="true"]{background:rgba(99,102,241,.2);color:var(--brand-300);}
+body[data-researcher="off"] .ref-toggle,body[data-researcher="off"] .ref-panel{display:none;}
+.float-toolbar{flex-wrap:wrap;}
+
+/* Settings */
+.settings-nav-item,.sidebar-item{font-family:var(--font-body);}
+.settings-body{max-width:860px;}
+.settings-row-info{min-width:0;}
+.profile-avatar{background-size:cover;background-position:center;}
+.s-select{max-width:100%;}
+.settings-block{scroll-margin-top:16px;}
+
+/* Compact sidebar (Settings → Appearance) */
+body.compact-sidebar{--sidebar-w:64px;}
+body.compact-sidebar .sidebar{padding-left:var(--space-1);padding-right:var(--space-1);}
+body.compact-sidebar .sidebar-item,
+body.compact-sidebar .proj-item,
+body.compact-sidebar .folder-item,
+body.compact-sidebar .sidebar-add{font-size:0;justify-content:center;gap:0;}
+body.compact-sidebar .sidebar-item .s-icon,
+body.compact-sidebar .folder-item .folder-icon{font-size:16px;}
+body.compact-sidebar .sidebar-add::before{content:'＋';font-size:14px;}
+body.compact-sidebar .sidebar-label,
+body.compact-sidebar .ws-name,body.compact-sidebar .ws-type,body.compact-sidebar .ws-chevron,
+body.compact-sidebar .s-count,body.compact-sidebar .folder-sub{display:none;}
+body.compact-sidebar .ws-chip{justify-content:center;}
+body.compact-sidebar .topbar-brand{font-size:0;}
+body.compact-sidebar .topbar-brand::before{content:'F';font-size:17px;}
+body.compact-sidebar .topbar-logo-zone{justify-content:center;padding:0;}
+body.compact-sidebar .sidebar-item.active::before{left:-2px;}
+
+/* ── Toasts ── */
+.toast-region{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:1300;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:max-content;max-width:calc(100vw - 32px);}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:var(--radius-md);background:var(--surface-raised);border:1px solid rgb(var(--fg) / .18);box-shadow:var(--shadow-xl);font-size:13px;color:var(--surface-text);animation:toast-in var(--dur-normal) var(--ease-out);}
+.toast button{background:none;border:0;color:var(--brand-300);font:inherit;font-weight:700;cursor:pointer;padding:2px 4px;border-radius:4px;}
+@keyframes toast-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* ── Modal + command palette ── */
+.modal-overlay{position:fixed;inset:0;z-index:1200;background:rgba(5,5,18,.62);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:12vh 16px 16px;overflow:auto;}
+.modal{width:100%;max-width:420px;background:var(--surface-raised);border:1px solid var(--surface-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);padding:22px;animation:toast-in var(--dur-normal) var(--ease-out);}
+.modal h2{font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--surface-text);margin-bottom:4px;}
+.modal .modal-sub{font-size:13px;color:var(--surface-muted);margin-bottom:16px;line-height:1.5;}
+.modal .form-field{margin-bottom:14px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
+.btn-danger{background:var(--danger-600);color:#fff;}
+.btn-danger:hover{background:var(--danger-500);}
+.palette{max-width:580px;padding:0;overflow:hidden;}
+.palette-input{width:100%;padding:16px 18px;background:transparent;border:0;border-bottom:1px solid var(--surface-border);color:var(--surface-text);font:inherit;font-size:15px;outline:none;}
+.palette-input::placeholder{color:var(--surface-muted);}
+.palette-list{max-height:min(52vh,380px);overflow-y:auto;padding:6px;}
+.palette-group{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--surface-faint);padding:10px 10px 4px;}
+.palette-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border-radius:var(--radius-sm);background:none;border:0;color:var(--surface-text);font:inherit;font-size:13px;text-align:left;cursor:pointer;}
+.palette-item[aria-selected="true"]{background:rgba(99,102,241,.16);}
+.palette-item .pi-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.palette-item .pi-kind{margin-left:auto;font-size:11px;color:var(--surface-muted);white-space:nowrap;}
+.palette-empty{padding:28px 16px;text-align:center;color:var(--surface-muted);font-size:13px;}
+.palette-foot{display:flex;gap:14px;padding:9px 14px;border-top:1px solid var(--surface-border);font-size:11px;color:var(--surface-muted);}
+
+/* ── Popovers ── */
+.popover{position:fixed;z-index:1100;min-width:210px;max-width:min(340px,calc(100vw - 16px));background:var(--surface-raised);border:1px solid rgb(var(--fg) / .16);border-radius:var(--radius-md);box-shadow:var(--shadow-xl);padding:6px;animation:toast-in var(--dur-fast) var(--ease-out);}
+.pop-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:0;background:none;border-radius:var(--radius-sm);color:var(--surface-text);font:inherit;font-size:13px;text-align:left;cursor:pointer;}
+.pop-item:hover{background:var(--surface-subtle);}
+.pop-item[aria-checked="true"]::after{content:'✓';margin-left:auto;color:var(--brand-400);font-weight:700;}
+.pop-item.danger{color:var(--danger-500);}
+.pop-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px 6px;font-size:12px;font-weight:700;color:var(--surface-text);}
+.pop-head button{background:none;border:0;color:var(--brand-400);font:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+.pop-sub{font-size:11px;font-weight:400;color:var(--surface-muted);}
+.pop-sep{height:1px;background:var(--surface-border);margin:5px 2px;}
+.pop-note{display:flex;gap:10px;padding:9px 10px;font-size:12px;line-height:1.45;border-radius:var(--radius-sm);width:100%;border:0;background:none;color:var(--surface-text);font-family:inherit;text-align:left;cursor:pointer;}
+.pop-note:hover{background:var(--surface-subtle);}
+.pop-note.unread{background:rgba(99,102,241,.1);}
+.pop-note .pn-when{display:block;font-size:11px;color:var(--surface-muted);margin-top:2px;}
+
+/* ── Mobile navigation drawer ── */
+.menu-btn{display:none;}
+.nav-scrim{display:none;}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE  (the original had no breakpoints)
+   ═══════════════════════════════════════════════════════════════ */
+.screen-tabs{overflow-x:auto;scrollbar-width:none;}
+.screen-tabs::-webkit-scrollbar{display:none;}
+.app-shell{grid-template-columns:var(--sidebar-w) minmax(0,1fr);height:calc(100dvh - 48px);}
+.auth-shell{min-height:calc(100dvh - 48px);}
+.main{min-width:0;}
+
+@media (max-width:1180px){
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .dash-cols{grid-template-columns:1fr;}
+  .dash-content{padding:var(--space-6);}
+}
+@media (max-width:900px){
+  .app-shell{grid-template-columns:minmax(0,1fr);}
+  .topbar-logo-zone{width:auto;border-right:0;padding:0 var(--space-2) 0 var(--space-2);}
+  .topbar-center{padding:0 var(--space-2);min-width:0;}
+  .search-bar{width:100%;}
+  .menu-btn{display:flex;}
+  .sidebar{position:fixed;top:calc(48px + var(--topbar-h));left:0;bottom:0;width:272px;z-index:900;transform:translateX(-102%);transition:transform var(--dur-slow) var(--ease-out);box-shadow:var(--shadow-xl);}
+  body.nav-open .sidebar{transform:none;}
+  body.nav-open .nav-scrim{display:block;position:fixed;inset:calc(48px + var(--topbar-h)) 0 0 0;background:rgba(0,0,0,.5);z-index:850;}
+  body.compact-sidebar{--sidebar-w:240px;}
+  body.compact-sidebar .sidebar-item,body.compact-sidebar .proj-item,body.compact-sidebar .folder-item,body.compact-sidebar .sidebar-add{font-size:13px;justify-content:flex-start;gap:var(--space-2);}
+  body.compact-sidebar .sidebar-add::before{content:none;}
+  body.compact-sidebar .sidebar-label,body.compact-sidebar .ws-name,body.compact-sidebar .ws-type,body.compact-sidebar .ws-chevron,body.compact-sidebar .s-count,body.compact-sidebar .folder-sub{display:revert;}
+  body.compact-sidebar .topbar-brand{font-size:17px;}
+  body.compact-sidebar .topbar-brand::before{content:none;}
+  .board-topbar-extra{overflow-x:auto;padding:0 var(--space-3);scrollbar-width:none;}
+  .topbar-breadcrumb{margin-left:var(--space-2);white-space:nowrap;}
+  .board-header{flex-direction:column;align-items:flex-start;gap:12px;}
+  .board-scroll{padding-left:var(--space-3);padding-right:var(--space-3);}
+  .slideover{width:100%;}
+  .notes-split{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);}
+  .notes-list-panel{border-right:0;border-bottom:1px solid var(--surface-border);max-height:190px;}
+  .note-editor-body{padding:24px 20px;}
+  .note-editor-topbar{padding:10px 16px;flex-wrap:wrap;}
+  .note-title-input{font-size:26px;}
+  .ref-panel.open{width:min(260px,70vw);position:absolute;right:0;top:0;bottom:0;z-index:20;box-shadow:var(--shadow-xl);}
+  .note-editor-wrap{position:relative;}
+  .settings-body{padding:var(--space-5);}
+  .form-grid{grid-template-columns:1fr;}
+  .settings-row{flex-wrap:wrap;}
+  /* auth: single column, brand panel collapses to a header */
+  .auth-shell{padding:var(--space-4);align-items:flex-start;}
+  .auth-wrap{grid-template-columns:1fr;max-width:520px;}
+  .auth-left{padding:28px 28px 24px;gap:14px;}
+  .auth-hero p,.auth-pills,.auth-stats{display:none;}
+  .auth-hero h2{font-size:22px;margin-bottom:0;}
+  .auth-right{padding:28px;}
+  .screen-badge{display:none;}
+}
+@media (max-width:640px){
+  .stat-row{grid-template-columns:1fr 1fr;gap:10px;}
+  .stat-value{font-size:24px;}
+  .dash-content{padding:var(--space-4);}
+  .proj-grid{grid-template-columns:1fr;}
+  .search-shortcut{display:none;}
+  .topbar-right{padding:0 var(--space-2);gap:2px;}
+  .task-item{flex-wrap:wrap;}
+  .task-due{margin-left:27px;}
+  .kanban-col{width:80vw;max-width:300px;}
+  .list-row{grid-template-columns:minmax(0,1fr) auto;}
+  .list-row .priority{display:none;}
+  .auth-right{padding:22px 18px;}
+  .auth-persona-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .persona-grid{grid-template-columns:1fr;}
+  .slideover-meta{gap:var(--space-2);}
+  .modal-overlay{padding-top:8vh;}
+  .slideover-footer{flex-wrap:wrap;gap:10px;}
+}
+@media (max-width:420px){
+  .stat-row{grid-template-columns:1fr;}
+  .topbar-center .search-text{display:none;}
+}
+@media (prefers-reduced-motion:reduce){
+  .slideover,.modal,.popover,.toast,.panel-flash{animation:none!important;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── Screen Navigation ── -->
+<div class="screen-nav">
+  <div class="screen-nav-brand">Flowdesk</div>
+  <div class="screen-tabs" role="tablist" aria-label="Screens">
+    <button type="button" class="s-tab active" onclick="show('auth',this)">01 Auth</button>
+    <button type="button" class="s-tab" onclick="show('dashboard',this)">02 Dashboard</button>
+    <button type="button" class="s-tab" onclick="show('kanban',this)">03 Kanban Board</button>
+    <button type="button" class="s-tab" onclick="show('notes',this)">04 Note Editor</button>
+    <button type="button" class="s-tab" onclick="show('settings',this)">05 Settings</button>
+  </div>
+  <div class="screen-badge">Phase 5 — UI Design</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 1 — AUTH
+═══════════════════════════════════════ -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-shell">
+    <div class="auth-wrap">
+
+      <!-- Left panel -->
+      <div class="auth-left">
+        <div class="auth-left-glow1"></div>
+        <div class="auth-left-glow2"></div>
+        <div class="auth-brand-mark">
+          <div class="auth-brand-name">Flowdesk</div>
+          <div class="auth-brand-tag">Work · Study · Research</div>
+        </div>
+        <div class="auth-hero">
+          <h2>One desk for every kind of <span>deep work</span></h2>
+          <p>Track projects like a developer, plan studies like a student, and organize research like a scholar — all from one focused workspace.</p>
+          <div class="auth-pills">
+            <span class="auth-pill">🧑‍💻 Kanban boards</span>
+            <span class="auth-pill">📝 Rich text notes</span>
+            <span class="auth-pill">📅 Study plans</span>
+            <span class="auth-pill">🔬 Research refs</span>
+            <span class="auth-pill">📁 File uploads</span>
+            <span class="auth-pill">⚡ Quick capture</span>
+          </div>
+        </div>
+        <div class="auth-stats">
+          <div><div class="auth-stat-val">3</div><div class="auth-stat-label">Personas</div></div>
+          <div><div class="auth-stat-val">7</div><div class="auth-stat-label">Collections</div></div>
+          <div><div class="auth-stat-val">∞</div><div class="auth-stat-label">Workspaces</div></div>
+        </div>
+      </div>
+
+      <!-- Right: Login -->
+      <form class="auth-right" id="auth-right-login" novalidate>
+        <div class="auth-tab-row">
+          <button type="button" class="auth-tab active" onclick="switchAuth('login')">Sign in</button>
+          <button type="button" class="auth-tab" onclick="switchAuth('register')">Create account</button>
+        </div>
+        <div class="auth-title">Welcome back</div>
+        <div class="auth-sub">Sign in to continue to your workspace</div>
+        <div class="form-field">
+          <label class="form-label" for="li-email">Email address</label>
+          <input id="li-email" class="form-input" type="email" value="ls.santo@email.com" autocomplete="email" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="li-pass">Password</label>
+          <div class="input-wrap">
+            <input id="li-pass" class="form-input" type="password" value="demo-password" autocomplete="current-password" />
+            <button type="button" class="input-eye" data-action="toggle-pass" aria-label="Show password" aria-pressed="false">👁</button>
+          </div>
+        </div>
+        <div class="flex items-center" style="margin-bottom:22px;">
+          <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--surface-muted);cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--brand-600);width:14px;height:14px;" /> Keep me signed in
+          </label>
+          <a href="#" class="auth-forgot" data-action="forgot" style="margin-left:auto;">Forgot password?</a>
+        </div>
+        <div class="form-error" id="li-error" role="alert" hidden></div>
+        <button type="submit" class="auth-btn">Sign in to Flowdesk</button>
+        <div class="auth-divider">or</div>
+        <button type="button" class="auth-google" data-action="google">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <div class="auth-footer">Don't have an account? <a href="#" onclick="switchAuth('register');return false;">Create one free</a></div>
+      </form>
+
+      <!-- Right: Register (hidden initially) -->
+      <form class="auth-right" id="auth-right-register" style="display:none;" novalidate>
+        <div class="auth-tab-row">
+          <button type="button" class="auth-tab" onclick="switchAuth('login')">Sign in</button>
+          <button type="button" class="auth-tab active" onclick="switchAuth('register')">Create account</button>
+        </div>
+        <div class="auth-title">Create your account</div>
+        <div class="auth-sub">Choose your persona to personalize your experience</div>
+        <div class="form-row" style="margin-bottom:14px;">
+          <div class="form-field" style="margin:0;">
+            <label class="form-label" for="rg-first">First name</label>
+            <input id="rg-first" class="form-input" type="text" placeholder="Your name" autocomplete="given-name" />
+          </div>
+          <div class="form-field" style="margin:0;">
+            <label class="form-label" for="rg-last">Last name</label>
+            <input id="rg-last" class="form-input" type="text" placeholder="Last name" autocomplete="family-name" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="rg-email">Email address</label>
+          <input id="rg-email" class="form-input" type="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="rg-pass">Password</label>
+          <div class="input-wrap">
+            <input id="rg-pass" class="form-input" type="password" placeholder="Min. 8 characters" autocomplete="new-password" />
+            <button type="button" class="input-eye" data-action="toggle-pass" aria-label="Show password" aria-pressed="false">👁</button>
+          </div>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:9px;">I am a... <span style="color:var(--surface-muted);font-weight:400;">(select all that apply)</span></div>
+        <div class="auth-persona-grid" style="margin-bottom:18px;">
+          <div class="auth-persona-card selected" data-toggle="selected">
+            <div class="persona-emoji">🧑‍💻</div>
+            <div class="persona-name">Developer</div>
+          </div>
+          <div class="auth-persona-card" data-toggle="selected">
+            <div class="persona-emoji">🎓</div>
+            <div class="persona-name">Student</div>
+          </div>
+          <div class="auth-persona-card" data-toggle="selected">
+            <div class="persona-emoji">🔬</div>
+            <div class="persona-name">Researcher</div>
+          </div>
+        </div>
+        <div class="form-error" id="rg-error" role="alert" hidden></div>
+        <button type="submit" class="auth-btn">Create account</button>
+        <div class="auth-footer">Already have an account? <a href="#" onclick="switchAuth('login');return false;">Sign in</a></div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 2 — DASHBOARD
+═══════════════════════════════════════ -->
+<div id="screen-dashboard" class="screen">
+  <div class="app-shell">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-logo-zone"><span class="topbar-brand">Flowdesk</span></div>
+      <div class="topbar-center">
+        <button type="button" class="search-bar" data-action="open-search" aria-label="Search cards, notes and projects">
+          <span aria-hidden="true">🔍</span> <span class="search-text">Search cards, notes, projects…</span>
+          <span class="search-shortcut">⌘K</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="icon-btn theme-btn" data-action="theme" aria-label="Switch to light theme">🌙</button>
+        <button type="button" class="icon-btn bell-btn" data-action="notifications" aria-label="Notifications" aria-haspopup="true" style="position:relative;"><span aria-hidden="true">🔔</span><span class="notif-badge"></span></button>
+        <button type="button" class="topbar-avatar" data-action="avatar-menu" aria-label="Account menu" aria-haspopup="true">LS</button>
+      </div>
+    </div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Workspace</div>
+        <div class="ws-chip">
+          <div class="ws-dot" style="background:var(--dev-color);"></div>
+          <div><div class="ws-name">Dev Work</div><div class="ws-type">work</div></div>
+          <span class="ws-chevron">▾</span>
+        </div>
+        <div class="sidebar-add" data-action="new-workspace">＋ New workspace</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <div class="sidebar-item active"><span class="s-icon">🏠</span> Home</div>
+        <div class="sidebar-item"><span class="s-icon">📋</span> My Tasks <span class="s-count" id="nav-task-count">3</span></div>
+        <div class="sidebar-item"><span class="s-icon">📅</span> Calendar</div>
+        <div class="sidebar-item"><span class="s-icon">⚡</span> Quick Capture</div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Projects</div>
+        <div class="mount" data-proj-list></div>
+        <div class="sidebar-add" data-action="new-project">＋ New project</div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Notes</div>
+        <div class="sidebar-item"><span class="s-icon">📝</span> All Notes</div>
+        <div class="sidebar-item"><span class="s-icon">📌</span> Pinned</div>
+        <div class="sidebar-item"><span class="s-icon">📁</span> Folders</div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-item"><span class="s-icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <!-- Main -->
+    <div class="main">
+      <div class="dash-content">
+        <div class="dash-greeting" id="dash-greeting">Good morning, Santo 👋</div>
+        <div class="dash-date">Sunday, June 28, 2026 · <span id="dash-open-count">3 open tasks</span></div>
+        <!-- Stat cards -->
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-card-accent" style="background:linear-gradient(90deg,var(--brand-500),var(--accent-500));"></div>
+            <div class="stat-label">Active Projects</div>
+            <div class="stat-value" id="stat-projects">4</div>
+            <div class="stat-sub" id="stat-projects-sub">2 kanban · 1 study · 1 research</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-accent" style="background:var(--danger-500);"></div>
+            <div class="stat-label">Tasks Today</div>
+            <div class="stat-value" id="stat-tasks">8</div>
+            <div class="stat-sub" id="stat-tasks-sub"><span class="trend-up">5 done</span>&nbsp;·&nbsp;<span class="trend-down">3 overdue</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-accent" style="background:var(--success-500);"></div>
+            <div class="stat-label">Notes This Week</div>
+            <div class="stat-value" id="stat-notes">12</div>
+            <div class="stat-sub"><span class="trend-up">↑ 4 from last week</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-accent" style="background:var(--warning-500);"></div>
+            <div class="stat-label">Study Streak</div>
+            <div class="stat-value">7d</div>
+            <div class="stat-sub">Keep going 🔥</div>
+          </div>
+        </div>
+        <!-- Two columns -->
+        <div class="dash-cols">
+          <div class="flex flex-col gap-4" style="gap:14px;">
+            <!-- Tasks -->
+            <div class="panel" id="panel-tasks">
+              <div class="panel-header">
+                <div class="panel-title">📋 Today's Tasks</div>
+                <button type="button" class="panel-action" id="tasks-toggle" data-action="tasks-toggle">Hide completed</button>
+              </div>
+              <div class="mount" id="task-list"></div>
+            </div>
+            <!-- Projects -->
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">🗂 Project Progress</div>
+                <button type="button" class="panel-action" data-go="kanban">All projects →</button>
+              </div>
+              <div class="proj-grid">
+                <div class="mount" id="proj-mount"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Right column -->
+          <div class="flex flex-col" style="gap:14px;">
+            <!-- Quick capture -->
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">⚡ Quick Capture</div></div>
+              <div class="qc-wrap">
+                <textarea class="qc-textarea" id="qc-text" aria-label="Quick capture" placeholder="Dump a thought or task — sort it later…"></textarea>
+                <div class="flex" style="gap:8px;margin-top:8px;justify-content:flex-end;">
+                  <button type="button" class="btn btn-ghost btn-sm" data-action="qc-note" disabled>Note</button>
+                  <button type="button" class="btn btn-primary btn-sm" data-action="qc-task" disabled>Add task</button>
+                </div>
+              </div>
+            </div>
+            <!-- Heatmap -->
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">📊 Activity</div><span class="text-xs text-muted">Last 12 weeks</span></div>
+              <div class="heatmap-wrap">
+                <div class="heatmap-grid">
+                  <div class="mount" id="heatmap-cells"></div>
+                </div>
+                <div class="flex items-center" style="gap:5px;margin-top:10px;">
+                  <span class="text-xs text-muted">Less</span>
+                  <div class="hm-cell"></div><div class="hm-cell hm-1"></div>
+                  <div class="hm-cell hm-2"></div><div class="hm-cell hm-3"></div>
+                  <div class="hm-cell hm-4"></div>
+                  <span class="text-xs text-muted">More</span>
+                </div>
+              </div>
+            </div>
+            <!-- Recent notes -->
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">📝 Recent Notes</div><button type="button" class="panel-action" data-go="notes">All notes →</button></div>
+              <div class="mount" id="recent-notes"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 3 — KANBAN BOARD
+═══════════════════════════════════════ -->
+<div id="screen-kanban" class="screen">
+  <div class="app-shell">
+    <div class="topbar">
+      <div class="topbar-logo-zone"><span class="topbar-brand">Flowdesk</span></div>
+      <div class="topbar-breadcrumb">
+        <span>Dev Work</span><span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current" id="crumb-project">Flowdesk App</span>
+      </div>
+      <div class="board-topbar-extra">
+        <div class="view-toggle">
+          <button type="button" class="view-btn active" data-view="board" aria-pressed="true">Board</button>
+          <button type="button" class="view-btn" data-view="list" aria-pressed="false">List</button>
+        </div>
+        <div class="filter-chip active" data-filter="all">🏷 All</div>
+        <div class="filter-chip" data-filter="today">⏰ Due today</div>
+        <div class="filter-chip" data-filter="high">🔴 High</div>
+        <button type="button" class="btn btn-primary btn-sm" data-action="add-card-top" style="margin-left:4px;">＋ Add card</button>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="ws-chip">
+          <div class="ws-dot" style="background:var(--dev-color);"></div>
+          <div><div class="ws-name">Dev Work</div><div class="ws-type">work</div></div>
+          <span class="ws-chevron">▾</span>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Main</div>
+        <div class="sidebar-item"><span class="s-icon">🏠</span> Home</div>
+        <div class="sidebar-item"><span class="s-icon">📋</span> My Tasks</div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Projects</div>
+        <div class="mount" data-proj-list></div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-item"><span class="s-icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="main" style="overflow:hidden;position:relative;">
+      <div class="board-main">
+        <div class="board-header">
+          <div>
+            <div class="board-title" id="board-title">Flowdesk App</div>
+            <div class="board-meta" id="board-meta"></div>
+          </div>
+          <div class="board-actions">
+            <div style="display:flex;align-items:center;">
+              <div class="avatar" style="width:24px;height:24px;font-size:9px;border:2px solid var(--surface-raised);">LS</div>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" data-go="settings">⚙ Settings</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-action="board-export">📤 Export</button>
+          </div>
+        </div>
+        <div class="list-view" id="list-view" hidden></div>
+        <div class="board-scroll" id="board-scroll">
+          <div class="board-cols">
+            <div class="mount" id="board-cols-mount"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Slide-Over -->
+      <div class="slideover-backdrop" id="slideover-backdrop" style="display:none;" onclick="closeSlideover()"></div>
+      <div class="slideover" id="slideover" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="so-title-label">
+        <div class="slideover-header">
+          <button type="button" class="slideover-close" onclick="closeSlideover()" aria-label="Close card">✕</button>
+          <label class="sr-only" id="so-title-label" for="so-title">Card title</label>
+          <textarea class="slideover-title-input" id="so-title" rows="2"></textarea>
+        </div>
+        <div class="slideover-meta">
+          <div class="meta-item"><label class="meta-label" for="so-status">Status</label><select class="meta-select" id="so-status"></select></div>
+          <div class="meta-item"><label class="meta-label" for="so-priority">Priority</label>
+            <select class="meta-select priority p-medium" id="so-priority">
+              <option value="urgent">urgent</option><option value="high">high</option><option value="medium">medium</option><option value="low">low</option>
+            </select></div>
+          <div class="meta-item"><label class="meta-label" for="so-due">Due</label><input class="meta-input" id="so-due" type="text" placeholder="e.g. Jul 12" autocomplete="off" /></div>
+          <div class="meta-item"><span class="meta-label">Tags</span><span id="so-tags" class="so-tags"></span><button type="button" class="meta-add" data-action="so-add-tag" aria-label="Add tag">＋</button></div>
+        </div>
+        <div class="slideover-body">
+          <div class="editor-toolbar" role="toolbar" aria-label="Formatting">
+            <button type="button" class="toolbar-btn">B</button>
+            <button type="button" class="toolbar-btn" style="font-style:italic;">I</button>
+            <button type="button" class="toolbar-btn" style="text-decoration:underline;">U</button>
+            <button type="button" class="toolbar-btn" style="text-decoration:line-through;">S</button>
+            <div class="toolbar-sep"></div>
+            <button type="button" class="toolbar-btn">H1</button>
+            <button type="button" class="toolbar-btn">H2</button>
+            <div class="toolbar-sep"></div>
+            <button type="button" class="toolbar-btn">≡</button>
+            <button type="button" class="toolbar-btn">①</button>
+            <button type="button" class="toolbar-btn">☑</button>
+            <div class="toolbar-sep"></div>
+            <button type="button" class="toolbar-btn">&lt;/&gt;</button>
+            <button type="button" class="toolbar-btn">🔗</button>
+            <button type="button" class="toolbar-btn">📎</button>
+          </div>
+          <div class="editor-area" id="so-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Card description" data-placeholder="Add a description, checklist or notes…" spellcheck="false"></div>
+          <input type="file" id="so-file" multiple hidden />
+        </div>
+        <div class="slideover-footer">
+          <div class="flex items-center gap-2 so-foot-info">
+            <span id="so-attach">📎 0 attachments</span>
+            <span aria-hidden="true">·</span>
+            <span id="so-status-text">Updated 2h ago</span>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="btn btn-ghost btn-sm" data-action="so-delete">🗑 Delete</button>
+            <button type="button" class="btn btn-primary btn-sm" data-action="so-save">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 4 — NOTE EDITOR
+═══════════════════════════════════════ -->
+<div id="screen-notes" class="screen">
+  <div class="app-shell">
+    <div class="topbar">
+      <div class="topbar-logo-zone"><span class="topbar-brand">Flowdesk</span></div>
+      <div class="topbar-center">
+        <button type="button" class="search-bar" data-action="open-search" aria-label="Search notes">
+          <span aria-hidden="true">🔍</span> <span class="search-text">Search notes…</span> <span class="search-shortcut">⌘K</span></button>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="icon-btn theme-btn" data-action="theme" aria-label="Switch to light theme">🌙</button>
+        <button type="button" class="btn btn-primary btn-sm">＋ New note</button>
+        <button type="button" class="topbar-avatar" data-action="avatar-menu" aria-label="Account menu" aria-haspopup="true">LS</button>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="ws-chip">
+          <div class="ws-dot" style="background:var(--dev-color);"></div>
+          <div><div class="ws-name">Dev Work</div></div>
+          <span class="ws-chevron">▾</span>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Notes</div>
+        <div class="mount" id="folder-tree"></div>
+        <div class="sidebar-add" data-action="new-folder">＋ New folder</div>
+      </div>
+    </div>
+    <div class="main" style="overflow:hidden;">
+      <div class="notes-split">
+        <!-- Note list panel -->
+        <div class="notes-list-panel">
+          <div class="flex items-center justify-between" style="padding:4px 6px 12px;">
+            <span id="notes-list-title" style="font-size:12px;font-weight:700;color:var(--surface-text);">All Notes</span>
+            <span class="text-xs text-muted" id="notes-list-count">5 notes</span>
+          </div>
+          <div class="mount" id="note-list"></div>
+        </div>
+        <!-- Editor + optional ref panel -->
+        <div class="note-editor-wrap">
+          <div class="note-editor-main">
+            <div class="note-editor-topbar">
+              <div class="note-breadcrumb" id="note-crumb"></div>
+              <div class="note-actions">
+                <span class="note-status" id="note-status" role="status">Auto-saved just now</span>
+                <button type="button" class="icon-btn ref-toggle" data-action="toggle-refs" title="Toggle references" aria-label="Toggle references" aria-pressed="false">🔬</button>
+                <button type="button" class="icon-btn" data-action="note-export" title="Export note as Markdown" aria-label="Export note">📤</button>
+                <button type="button" class="icon-btn" data-action="note-more" title="More" aria-label="More note actions" aria-haspopup="true">⋯</button>
+              </div>
+            </div>
+            <div class="empty-state" id="note-empty" hidden><div class="empty-ico" aria-hidden="true">📝</div><p>No note selected</p><button type="button" class="btn btn-primary btn-sm" data-action="new-note">＋ New note</button></div>
+            <div class="note-editor-body" id="note-editor-body">
+              <textarea class="note-title-input" id="note-title" rows="1" aria-label="Note title" placeholder="Untitled note"></textarea>
+              <div class="note-tags-row" id="note-tags"></div>
+              <div class="note-divider-line"></div>
+              <!-- Floating toolbar example -->
+              <div class="float-toolbar" role="toolbar" aria-label="Formatting">
+                <button type="button" class="toolbar-btn active">B</button>
+                <button type="button" class="toolbar-btn" style="font-style:italic;">I</button>
+                <div class="toolbar-sep"></div>
+                <button type="button" class="toolbar-btn">H2</button>
+                <button type="button" class="toolbar-btn">H3</button>
+                <div class="toolbar-sep"></div>
+                <button type="button" class="toolbar-btn">🔗</button>
+                <button type="button" class="toolbar-btn">&lt;/&gt;</button>
+                <button type="button" class="toolbar-btn">≡</button>
+              </div>
+              <div class="note-body" id="note-body" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Note content" spellcheck="false"></div>
+            </div>
+          </div>
+          <!-- Reference panel (researcher persona) -->
+          <div class="ref-panel" id="ref-panel" aria-label="References">
+            <div class="ref-inner">
+              <div class="ref-title">📚 References</div>
+              <div class="mount" id="ref-list"></div>
+              <button type="button" class="btn btn-ghost btn-sm" data-action="add-ref" style="width:100%;margin-top:8px;">＋ Add reference</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 5 — SETTINGS
+═══════════════════════════════════════ -->
+<div id="screen-settings" class="screen">
+  <div class="app-shell">
+    <div class="topbar">
+      <div class="topbar-logo-zone"><span class="topbar-brand">Flowdesk</span></div>
+      <div class="topbar-center">
+        <span style="font-size:15px;font-weight:700;color:var(--surface-text);">Settings</span>
+      </div>
+      <div class="topbar-right">
+        <button type="button" class="topbar-avatar" data-action="avatar-menu" aria-label="Account menu" aria-haspopup="true">LS</button>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Account</div>
+        <div class="sidebar-item active"><span class="s-icon">👤</span> Profile</div>
+        <div class="sidebar-item"><span class="s-icon">🔐</span> Security</div>
+        <div class="sidebar-item"><span class="s-icon">🔔</span> Notifications</div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">App</div>
+        <div class="sidebar-item"><span class="s-icon">🏢</span> Workspaces</div>
+        <div class="sidebar-item"><span class="s-icon">🎨</span> Appearance</div>
+        <div class="sidebar-item"><span class="s-icon">🌐</span> Language</div>
+        <div class="sidebar-item"><span class="s-icon">📤</span> Export data</div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-item" style="color:rgba(244,63,94,.6);">⚠️ Danger zone</div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="settings-body">
+        <div class="settings-page-title">Profile Settings</div>
+        <div class="settings-page-sub">Manage your personal info and how Flowdesk works for you</div>
+
+        <!-- Profile block -->
+        <div class="settings-block" id="set-profile">
+          <div class="settings-block-header">Personal Info</div>
+          <div class="settings-block-body">
+            <div class="profile-avatar-zone">
+              <div class="profile-avatar" id="profile-avatar">LS</div>
+              <div class="avatar-btn-row">
+                <button type="button" class="avatar-btn" data-action="upload-photo">Upload photo</button>
+                <input type="file" id="photo-file" accept="image/*" hidden />
+                <button type="button" class="avatar-btn danger" data-action="remove-photo">Remove photo</button>
+              </div>
+            </div>
+            <div class="form-grid" style="margin-bottom:14px;">
+              <div>
+                <label class="s-label" for="set-name">Full name</label>
+                <input class="s-input" id="set-name" type="text" value="ls_santo" />
+              </div>
+              <div>
+                <label class="s-label" for="set-email">Email address</label>
+                <input class="s-input" id="set-email" type="email" value="ls.santo@email.com" />
+              </div>
+            </div>
+            <div>
+              <label class="s-label" for="set-bio">Bio</label>
+              <input class="s-input" id="set-bio" type="text" placeholder="Full Stack Developer at Jamuna TV" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Persona block -->
+        <div class="settings-block">
+          <div class="settings-block-header">My Persona</div>
+          <div class="settings-block-body">
+            <div class="text-muted" style="font-size:12px;margin-bottom:14px;">Select which modes are active for you. This controls which features appear in your sidebar.</div>
+            <div class="persona-grid">
+              <div class="persona-card active" data-toggle="active">
+                <div class="persona-card-icon">🧑‍💻</div>
+                <div class="persona-card-name">Developer</div>
+                <div class="persona-card-desc">Kanban, GitHub links</div>
+              </div>
+              <div class="persona-card" data-toggle="active">
+                <div class="persona-card-icon">🎓</div>
+                <div class="persona-card-name">Student</div>
+                <div class="persona-card-desc">Study plans, Pomodoro</div>
+              </div>
+              <div class="persona-card" data-toggle="active">
+                <div class="persona-card-icon">🔬</div>
+                <div class="persona-card-name">Researcher</div>
+                <div class="persona-card-desc">References, phases</div>
+              </div>
+            </div>
+            <div class="flex" style="margin-top:16px;justify-content:flex-end;">
+              <button type="button" class="btn btn-primary btn-sm" data-action="persona-save">Save persona</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security block -->
+        <div class="settings-block" id="set-security">
+          <div class="settings-block-header">Security</div>
+          <div class="settings-block-body">
+            <form id="pw-form" novalidate>
+              <div class="form-grid" style="margin-bottom:14px;">
+                <div>
+                  <label class="s-label" for="pw-current">Current password</label>
+                  <input class="s-input" id="pw-current" type="password" autocomplete="current-password" />
+                </div>
+                <div></div>
+                <div>
+                  <label class="s-label" for="pw-new">New password</label>
+                  <input class="s-input" id="pw-new" type="password" autocomplete="new-password" placeholder="Min. 8 characters" />
+                </div>
+                <div>
+                  <label class="s-label" for="pw-confirm">Confirm new password</label>
+                  <input class="s-input" id="pw-confirm" type="password" autocomplete="new-password" />
+                </div>
+              </div>
+              <div class="form-error" id="pw-error" role="alert" hidden></div>
+              <div class="flex" style="justify-content:flex-end;">
+                <button type="submit" class="btn btn-primary btn-sm">Update password</button>
+              </div>
+            </form>
+            <div class="settings-row" style="margin-top:18px;" data-session="s1">
+              <div class="settings-row-info">
+                <div class="settings-row-label">Chrome on Linux</div>
+                <div class="settings-row-desc">This device · active now</div>
+              </div>
+              <span class="badge badge-success">Current</span>
+            </div>
+            <div class="settings-row" data-session="s2">
+              <div class="settings-row-info">
+                <div class="settings-row-label">Firefox on Android</div>
+                <div class="settings-row-desc">Last active 3 days ago</div>
+              </div>
+              <button type="button" class="avatar-btn" data-action="end-session">Sign out</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications block -->
+        <div class="settings-block" id="set-notifications">
+          <div class="settings-block-header">Notifications</div>
+          <div class="settings-block-body">
+            <div class="mount" id="notif-rows"></div>
+          </div>
+        </div>
+
+        <!-- Workspaces block -->
+        <div class="settings-block" id="set-workspaces">
+          <div class="settings-block-header">
+            Workspaces
+            <button type="button" class="btn btn-primary btn-sm" data-action="new-workspace">＋ New workspace</button>
+          </div>
+          <div class="settings-block-body">
+            <div class="mount" id="ws-list-mount"></div>
+          </div>
+        </div>
+
+        <!-- Appearance block -->
+        <div class="settings-block" id="set-appearance">
+          <div class="settings-block-header">Appearance</div>
+          <div class="settings-block-body">
+            <div class="mount" id="appearance-rows"></div>
+          </div>
+        </div>
+
+        <!-- Export block -->
+        <div class="settings-block" id="set-export">
+          <div class="settings-block-header">Export data</div>
+          <div class="settings-block-body">
+            <div class="settings-row">
+              <div class="settings-row-info">
+                <div class="settings-row-label">Boards &amp; cards</div>
+                <div class="settings-row-desc">Every project, column and card as a JSON file</div>
+              </div>
+              <button type="button" class="avatar-btn" data-action="export-json">Download JSON</button>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-info">
+                <div class="settings-row-label">Notes</div>
+                <div class="settings-row-desc">All notes as one Markdown file</div>
+              </div>
+              <button type="button" class="avatar-btn" data-action="export-notes">Download Markdown</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save row -->
+        <div class="flex" style="justify-content:flex-end;margin-bottom:20px;">
+          <button type="button" class="btn btn-ghost btn-sm" data-action="settings-cancel" style="margin-right:8px;">Cancel</button>
+          <button type="button" class="btn btn-primary" data-action="settings-save">Save all changes</button>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="danger-zone" id="set-danger">
+          <div class="danger-zone-title">⚠️ Danger Zone</div>
+          <div class="danger-zone-desc">These actions are permanent and cannot be undone. Export your data before proceeding.</div>
+          <button type="button" class="btn-danger-outline" data-action="export-json">Export all data</button>
+          <button type="button" class="btn-danger-fill" data-action="delete-account">Delete account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   Flowdesk — UI prototype logic (plain JavaScript, JSDoc for shapes)
+   Everything below renders from plain data objects, so the screens stay
+   consistent (counts, stats, lists) and every control does something.
+   ═══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  /**
+   * @typedef {'urgent'|'high'|'medium'|'low'} Priority
+   * @typedef {{id:string, text:string, priority:Priority, due:string, done:boolean, overdue?:boolean}} Task
+   * @typedef {{id:string, name:string, type:string, color:string, pct:number}} Project
+   * @typedef {{id:string, col:string, title:string, priority:Priority, tags:string[], due:string, over?:boolean, desc?:string, files?:string[]}} Card
+   * @typedef {{id:string, title:string, cls:string, accent:string, badge:string, done?:boolean}} Column
+   * @typedef {{id:string, title:string, preview:string, icon:string, when:string, folder:string, tags:string[], pinned:boolean, body:string}} Note
+   */
+
+  /* ───────────── tiny helpers ───────────── */
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  let seq = 100;
+  const uid = (p) => p + (++seq);
+  const prefersReducedMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const plainText = (html) => { const d = document.createElement('div'); d.innerHTML = html; return (d.textContent || '').replace(/\s+/g, ' ').trim(); };
+  const slug = (s) => String(s).trim().toLowerCase().replace(/[^a-z0-9\u0980-\u09ff]+/g, '-').replace(/^-+|-+$/g, '');
+
+  function download(filename, text, type) {
+    try {
+      const url = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      return true;
+    } catch (err) { toast('Download is not available in this browser.'); return false; }
+  }
+
+  /* ───────────── seed data ───────────── */
+  const card = (col, title, priority, tags, due, extra) => Object.assign({ id: uid('c'), col, title, priority, tags, due }, extra || {});
+
+  const DND_DESC =
+    '<h3>Overview</h3><p>Implement the Kanban board drag-and-drop using <code>@dnd-kit/core</code>. Cards must be draggable within columns and across columns. Column reorder should also work.</p>' +
+    '<h3>Checklist</h3><ul class="checklist">' +
+    '<li><label><input type="checkbox" checked> Install and configure @dnd-kit/core</label></li>' +
+    '<li><label><input type="checkbox" checked> Set up DndContext and SortableContext</label></li>' +
+    '<li><label><input type="checkbox"> Build draggable Card component</label></li>' +
+    '<li><label><input type="checkbox"> Build droppable Column component</label></li>' +
+    '<li><label><input type="checkbox"> Handle cross-column card moves</label></li>' +
+    '<li><label><input type="checkbox"> Update position (float) on DB after drop</label></li>' +
+    '<li><label><input type="checkbox"> Optimistic UI — update Zustand before API call</label></li></ul>' +
+    '<h3>Notes</h3><p>Use float positions for cards (1.0, 2.0…). Insert between two cards = avg of neighbors. Reindex when gap &lt; 0.001. See architecture doc section 7 for reasoning.</p>';
+
+  const state = {
+    user: { first: 'Santo', initials: 'LS', email: 'ls.santo@email.com' },
+    themePref: 'dark',
+    hideDone: false,
+    /** @type {Task[]} */
+    tasks: [
+      { id: 't1', text: 'Set up Express server boilerplate', priority: 'high', due: 'Done', done: true },
+      { id: 't2', text: 'Design DB schema for Flowdesk', priority: 'medium', due: 'Done', done: true },
+      { id: 't3', text: 'Build Kanban board with dnd-kit', priority: 'urgent', due: '2d overdue', done: false, overdue: true },
+      { id: 't4', text: 'Write TipTap editor component', priority: 'high', due: 'Today', done: false },
+      { id: 't5', text: 'Review Appifylab job requirements', priority: 'low', due: 'Jun 30', done: false },
+    ],
+    /** @type {Project[]} */
+    projects: [
+      { id: 'p-flowdesk', name: 'Flowdesk App', type: 'kanban', color: '#4f46e5', pct: 20 },
+      { id: 'p-bdnews', name: 'bdnewsfeed', type: 'kanban', color: '#10b981', pct: 78 },
+      { id: 'p-appify', name: 'Appifylab Prep', type: 'study', color: '#f59e0b', pct: 45 },
+      { id: 'p-santo', name: 'Santo Portfolio', type: 'kanban', color: '#8b5cf6', pct: 100 },
+    ],
+    activeProject: 'p-flowdesk',
+    boards: {},
+    filter: 'all',
+    view: 'board',
+    composing: null, // {col:string} | {newCol:true}
+    openCardId: null,
+    notesFilter: 'all',
+    activeNote: null,
+    folders: [
+      { name: 'Research', children: ['BFS Notes', 'API Design'] },
+      { name: 'Study', children: [] },
+      { name: 'Personal', children: [] },
+    ],
+    /** @type {Note[]} */
+    notes: [
+      { id: 'n1', title: 'BFS Crawling Architecture', icon: '🔬', when: '2h ago', folder: 'BFS Notes', pinned: true, tags: ['research', 'bdnewsfeed', 'crawler'],
+        preview: 'Technical deep-dive into breadth-first crawling for bdnewsfeed scraper engine…',
+        body: '<h2>Overview</h2><p>The bdnewsfeed scraper uses a multi-layer extraction chain — <strong>Trafilatura → Newspaper4k → readability-lxml</strong> — with BFS crawling as the discovery mechanism. Each source is crawled on a configurable schedule via APScheduler.</p>' +
+          '<h3>BFS Algorithm</h3><p>Breadth-first search starts from a seed URL and visits all links at the current depth before going deeper. This ensures broad coverage of a news portal before going into article detail pages.</p>' +
+          '<ul><li>Queue initialized with seed URL per source</li><li>Each popped URL is fetched, parsed for links, filtered by domain</li><li>robots.txt compliance checked before each fetch</li><li>Async fetch via <code>httpx</code> with configurable concurrency limit</li></ul>' +
+          '<blockquote>robots.txt compliance is non-negotiable — violation risks IP block and legal exposure. Check on every run, cache result for 24h.</blockquote>' +
+          '<h3>Extraction Chain</h3><p>Articles go through three extractors in sequence. If Trafilatura returns content above threshold, we stop. Otherwise fall through to Newspaper4k, then readability-lxml.</p>' +
+          '<p>This was the key architectural decision that improved extraction success rate from ~60% to ~94% across 27 sources.</p>' },
+      { id: 'n2', title: 'Appifylab Interview Prep', icon: '📚', when: 'Yesterday', folder: 'Study', pinned: false, tags: ['interview', 'react'],
+        preview: 'Questions on React hooks, system design, EzyCourse product overview…',
+        body: '<h2>Topics to cover</h2><ul><li>React hooks — <code>useEffect</code> cleanup, custom hooks, stale closures</li><li>System design — how I would structure a course platform</li><li>EzyCourse product overview and who it serves</li></ul><h3>Questions to ask them</h3><p>What does the first 90 days look like, and how does the team ship and review code?</p>' },
+      { id: 'n3', title: 'dnd-kit Quick Reference', icon: '📝', when: 'Jun 26', folder: 'Personal', pinned: false, tags: ['dnd-kit', 'frontend'],
+        preview: 'Key APIs: DndContext, useSortable, SortableContext, arrayMove…',
+        body: '<h2>Key APIs</h2><ul><li><code>DndContext</code> — wraps everything and owns the drag events</li><li><code>SortableContext</code> — gives a list its sortable strategy</li><li><code>useSortable</code> — per-item hook for transforms and listeners</li><li><code>arrayMove</code> — reorder helper used in <code>onDragEnd</code></li></ul>' },
+      { id: 'n4', title: 'Flowdesk DB Schema Notes', icon: '📝', when: 'Jun 25', folder: 'API Design', pinned: false, tags: ['flowdesk', 'mongodb'],
+        preview: 'MongoDB schema decisions — why float positions, Mixed type for TipTap…',
+        body: '<h2>Schema decisions</h2><ul><li>Float positions for cards and columns, so a move writes one document</li><li>Mixed type for TipTap JSON, plus a plain-text copy for search</li><li>Soft delete with <code>deletedAt</code> on every collection</li><li>Labels live in their own collection and cards store <code>labelIds</code></li></ul>' },
+      { id: 'n5', title: 'Quick thoughts — dark mode', icon: '💡', when: 'Jun 24', folder: 'Personal', pinned: false, tags: ['design'],
+        preview: 'Layered slate approach vs flat dark. surface-base, surface-raised, overlay…',
+        body: '<h2>Layered slate vs flat dark</h2><p>Three surfaces — <code>surface-base</code>, <code>surface-raised</code> and <code>surface-overlay</code> — give depth without heavy shadows. Borders stay at 7% white.</p>' },
+    ],
+    refs: [
+      { id: 'r1', title: 'Scrapy Architecture Overview', meta: 'Scrapy docs · 2024' },
+      { id: 'r2', title: 'BFS vs DFS for web crawling', meta: 'Smith, J. · arXiv 2023' },
+      { id: 'r3', title: 'robots.txt Protocol Spec', meta: 'RFC 9309 · 2022' },
+      { id: 'r4', title: 'Trafilatura: A Python Library', meta: 'Barbaresi, A. · ACL 2021' },
+    ],
+    workspaces: [
+      { id: 'w1', name: 'Dev Work', type: 'work', icon: '💻', color: '#4f46e5', meta: '4 projects · 24 cards' },
+      { id: 'w2', name: 'Appifylab Prep', type: 'study', icon: '📚', color: '#10b981', meta: '1 project · 18 cards' },
+      { id: 'w3', name: 'Research Notes', type: 'research', icon: '🔬', color: '#8b5cf6', meta: '2 projects · 9 notes' },
+    ],
+    activeWorkspace: 'w1',
+    notifs: [
+      { id: 'nf1', icon: '⏰', text: '“Build Kanban board with dnd-kit” is 2 days overdue', when: '2h ago', unread: true, go: 'card:dnd' },
+      { id: 'nf2', icon: '🔐', text: '“JWT auth with refresh token rotation” moved to Review', when: 'Yesterday', unread: true, go: 'card:jwt' },
+      { id: 'nf3', icon: '🔥', text: 'You are on a 7-day study streak. Keep it going.', when: 'Jun 26', unread: false, go: 'dashboard' },
+    ],
+  };
+
+  const defaultColumns = () => ([
+    { id: 'todo', title: 'To Do', cls: 'col-todo', accent: 'var(--surface-muted)', badge: 'badge-gray' },
+    { id: 'progress', title: 'In Progress', cls: 'col-progress', accent: 'var(--brand-500)', badge: 'badge-brand' },
+    { id: 'review', title: 'Review', cls: 'col-review', accent: 'var(--warning-500)', badge: 'badge-warning' },
+    { id: 'done', title: 'Done', cls: 'col-done', accent: 'var(--success-500)', badge: 'badge-gray', done: true },
+  ]);
+
+  state.boards['p-flowdesk'] = {
+    columns: defaultColumns(),
+    cards: [
+      card('todo', 'Design Settings page UI', 'medium', ['ui', 'phase-5'], 'Jul 2'),
+      card('todo', 'Build folder tree component', 'low', ['component'], 'Jul 4'),
+      card('todo', 'Set up Cloudinary integration', 'medium', ['backend'], 'Jul 6'),
+      card('todo', 'Write unit tests for auth', 'low', ['testing'], 'Jul 8'),
+      card('todo', 'Wire up global search modal', 'medium', ['frontend', 'search'], 'Jul 10'),
+      card('progress', 'Build Kanban board with dnd-kit', 'urgent', ['dnd-kit', 'frontend'], 'Overdue', { over: true, desc: DND_DESC, key: 'dnd' }),
+      card('progress', 'Write TipTap editor component', 'high', ['tiptap', 'editor'], 'Today'),
+      card('progress', 'Set up MongoDB connection + models', 'high', ['backend', 'db'], 'Jun 30'),
+      card('review', 'JWT auth with refresh token rotation', 'high', ['auth', 'security'], 'Jun 28', { key: 'jwt' }),
+      card('review', 'Design system — Phase 4', 'medium', ['design'], 'Done'),
+      card('done', 'Architecture document', 'high', ['docs'], 'Jun 20'),
+      card('done', 'Wireframes — Phase 3', 'medium', ['design'], 'Jun 22'),
+      card('done', 'Express server boilerplate setup', 'high', ['backend'], 'Jun 24'),
+      card('done', 'DB schema — 7 collections', 'high', ['db'], 'Jun 25'),
+    ],
+  };
+  state.activeNote = 'n1';
+
+  /* ───────────── lookups ───────────── */
+  const project = (id) => state.projects.find((p) => p.id === (id || state.activeProject));
+  const board = (pid) => {
+    const id = pid || state.activeProject;
+    if (!state.boards[id]) state.boards[id] = { columns: defaultColumns(), cards: [] };
+    return state.boards[id];
+  };
+  const findCard = (cid) => {
+    for (const [pid, b] of Object.entries(state.boards)) {
+      const c = b.cards.find((x) => x.id === cid);
+      if (c) return { card: c, board: b, pid };
+    }
+    return null;
+  };
+  const cardByKey = (key) => state.boards['p-flowdesk'].cards.find((c) => c.key === key);
+  const noteById = (id) => state.notes.find((n) => n.id === id);
+  const workspace = () => state.workspaces.find((w) => w.id === state.activeWorkspace) || state.workspaces[0];
+  const topFolder = (name) => {
+    const parent = state.folders.find((f) => f.children.includes(name));
+    return parent ? parent.name : name;
+  };
+  const phaseOf = (pct) => Math.min(7, Math.max(1, Math.floor(pct / 14)));
+
+  /* ───────────── toast ───────────── */
+  let toastRegion = null;
+  /**
+   * @param {string} msg
+   * @param {{action?:string, onAction?:function, timeout?:number}} [opts]
+   */
+  function toast(msg, opts) {
+    const o = opts || {};
+    if (!toastRegion) {
+      toastRegion = document.createElement('div');
+      toastRegion.className = 'toast-region';
+      toastRegion.setAttribute('role', 'status');
+      toastRegion.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toastRegion);
+    }
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = '<span>' + esc(msg) + '</span>' + (o.action ? '<button type="button">' + esc(o.action) + '</button>' : '');
+    toastRegion.appendChild(el);
+    const remove = () => { if (el.parentNode) el.remove(); };
+    if (o.action) {
+      el.querySelector('button').addEventListener('click', () => { remove(); if (o.onAction) o.onAction(); });
+    }
+    setTimeout(remove, o.timeout || (o.action ? 6000 : 3200));
+  }
+
+  /* ───────────── modal / dialogs ───────────── */
+  /**
+   * Opens an overlay containing `inner` (its first element becomes the dialog).
+   * @returns {{root:HTMLElement, dialog:HTMLElement, close:function}}
+   */
+  function openModal(inner, onClose) {
+    closePopover();
+    const prev = document.activeElement;
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = inner;
+    document.body.appendChild(overlay);
+    const dialog = overlay.firstElementChild;
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    let closed = false;
+    function close() {
+      if (closed) return;
+      closed = true;
+      overlay.remove();
+      document.removeEventListener('keydown', onKey, true);
+      if (prev && prev.focus && document.contains(prev)) prev.focus();
+      if (onClose) onClose();
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); close(); return; }
+      if (e.key === 'Tab') {
+        const f = $$('button:not([disabled]),input:not([disabled]),select,textarea,[tabindex="0"]', dialog).filter((n) => n.offsetParent !== null || n === document.activeElement);
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    document.addEventListener('keydown', onKey, true);
+    overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) close(); });
+    setTimeout(() => { const f = $('input,select,textarea,button', dialog); if (f) f.focus(); }, 0);
+    return { root: overlay, dialog, close };
+  }
+
+  /**
+   * Generic form dialog. Resolves with {name: value} or null when cancelled.
+   * @param {{title:string, sub?:string, fields?:Array, confirm?:string, danger?:boolean, check?:function}} cfg
+   */
+  function formDialog(cfg) {
+    return new Promise((resolve) => {
+      const id = uid('dlg');
+      const fields = cfg.fields || [];
+      const fieldsHtml = fields.map((f, i) => {
+        const fid = id + '-' + i;
+        const control = f.type === 'select'
+          ? '<select class="s-input s-select-wide" id="' + fid + '" name="' + esc(f.name) + '">' +
+            f.options.map((o) => '<option value="' + esc(o.value != null ? o.value : o) + '"' + ((o.value != null ? o.value : o) === f.value ? ' selected' : '') + '>' + esc(o.label != null ? o.label : o) + '</option>').join('') + '</select>'
+          : '<input class="form-input" id="' + fid + '" name="' + esc(f.name) + '" type="text" value="' + esc(f.value || '') + '" placeholder="' + esc(f.placeholder || '') + '" autocomplete="off" />';
+        return '<div class="form-field"><label class="form-label" for="' + fid + '">' + esc(f.label) + '</label>' + control + '</div>';
+      }).join('');
+      let m;
+      const html = '<form class="modal" novalidate aria-labelledby="' + id + '-t"><h2 id="' + id + '-t">' + esc(cfg.title) + '</h2>' +
+        (cfg.sub ? '<p class="modal-sub">' + esc(cfg.sub) + '</p>' : '') + fieldsHtml +
+        '<div class="form-error" role="alert" hidden></div>' +
+        '<div class="modal-actions"><button type="button" class="btn btn-ghost btn-sm" data-cancel>Cancel</button>' +
+        '<button type="submit" class="btn ' + (cfg.danger ? 'btn-danger' : 'btn-primary') + ' btn-sm">' + esc(cfg.confirm || 'Save') + '</button></div></form>';
+      m = openModal(html, () => resolve(null));
+      const form = m.dialog;
+      const err = $('.form-error', form);
+      $('[data-cancel]', form).addEventListener('click', () => m.close());
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const values = {};
+        for (const f of fields) {
+          const el = form.elements[f.name];
+          values[f.name] = el.value.trim();
+          if (f.required !== false && !values[f.name]) {
+            err.textContent = f.label + ' is required.'; err.hidden = false; el.setAttribute('aria-invalid', 'true'); el.focus(); return;
+          }
+        }
+        if (cfg.check) {
+          const msg = cfg.check(values);
+          if (msg) { err.textContent = msg; err.hidden = false; return; }
+        }
+        resolve(values);
+        m.close();
+      });
+    });
+  }
+
+  /* ───────────── popovers ───────────── */
+  let activePop = null;
+  function closePopover() {
+    if (!activePop) return;
+    const { pop, anchor } = activePop;
+    pop.remove();
+    if (anchor) anchor.setAttribute('aria-expanded', 'false');
+    activePop = null;
+  }
+  /**
+   * @param {HTMLElement} anchor
+   * @param {string} html
+   * @param {{align?:string, onSelect?:function}} [opts]
+   */
+  function openPopover(anchor, html, opts) {
+    const o = opts || {};
+    if (activePop && activePop.anchor === anchor) { closePopover(); return null; }
+    closePopover();
+    const pop = document.createElement('div');
+    pop.className = 'popover';
+    pop.innerHTML = html;
+    document.body.appendChild(pop);
+    const r = anchor.getBoundingClientRect();
+    const w = pop.offsetWidth;
+    let left = o.align === 'left' ? r.left : r.right - w;
+    left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+    pop.style.left = left + 'px';
+    pop.style.top = Math.min(r.bottom + 6, window.innerHeight - 60) + 'px';
+    anchor.setAttribute('aria-expanded', 'true');
+    activePop = { pop, anchor };
+    pop.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-pop]');
+      if (!item) return;
+      if (o.onSelect) o.onSelect(item.dataset.pop, item);
+    });
+    const first = $('button', pop);
+    if (first) first.focus();
+    return pop;
+  }
+  document.addEventListener('mousedown', (e) => {
+    if (activePop && !activePop.pop.contains(e.target) && !activePop.anchor.contains(e.target)) closePopover();
+  });
+
+  /* ───────────── screens & navigation ───────────── */
+  const SCREENS = ['auth', 'dashboard', 'kanban', 'notes', 'settings'];
+
+  function show(id, tab) {
+    if (!SCREENS.includes(id)) return;
+    closePopover();
+    document.body.classList.remove('nav-open');
+    $$('.screen').forEach((s) => s.classList.remove('active'));
+    $$('.s-tab').forEach((t, i) => {
+      const on = SCREENS[i] === id;
+      t.classList.toggle('active', on);
+      t.setAttribute('role', 'tab');
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    const target = document.getElementById('screen-' + id);
+    target.classList.add('active');
+    if (tab) tab.classList.add('active');
+    $$('.main', target).forEach((m) => { m.scrollTop = 0; });
+    try { history.replaceState(null, '', '#' + id); } catch (e) { /* file:// in some browsers */ }
+  }
+  const go = (id) => show(id);
+
+  /* ───────────── dashboard rendering ───────────── */
+  function applyUser() {
+    const u = state.user;
+    $$('.topbar-avatar,.avatar').forEach((el) => { el.textContent = u.initials; });
+    const pa = $('#profile-avatar');
+    if (pa && !pa.style.backgroundImage) pa.textContent = u.initials;
+    $('#dash-greeting').textContent = 'Good morning, ' + u.first + ' 👋';
+    renderBoard();
+  }
+
+  function renderTasks() {
+    const open = state.tasks.filter((t) => !t.done).length;
+    const done = state.tasks.length - open;
+    const overdue = state.tasks.filter((t) => !t.done && t.overdue).length;
+    const list = state.hideDone ? state.tasks.filter((t) => !t.done) : state.tasks;
+    $('#task-list').innerHTML = list.length
+      ? list.map((t) => {
+        const isOver = !t.done && t.overdue;
+        return '<div class="task-item" data-task="' + t.id + '">' +
+          '<button type="button" class="task-check' + (t.done ? ' done' : '') + '" role="checkbox" aria-checked="' + t.done + '" aria-label="' + esc((t.done ? 'Mark as not done: ' : 'Mark as done: ') + t.text) + '"></button>' +
+          '<span class="task-text' + (t.done ? ' done' : '') + '">' + esc(t.text) + '</span>' +
+          '<span class="priority p-' + t.priority + '" style="flex-shrink:0;">' + t.priority + '</span>' +
+          '<span class="task-due' + (isOver ? ' overdue' : '') + '">' + esc(t.done ? 'Done' : t.due) + '</span></div>';
+      }).join('')
+      : '<div class="empty-note">All caught up — nothing left to do.</div>';
+    $('#tasks-toggle').textContent = state.hideDone ? 'View all →' : 'Hide completed';
+    $('#stat-tasks').textContent = String(state.tasks.length);
+    $('#stat-tasks-sub').innerHTML = '<span class="trend-up">' + done + ' done</span>&nbsp;·&nbsp;<span class="trend-down">' + overdue + ' overdue</span>';
+    $('#dash-open-count').textContent = open + (open === 1 ? ' open task' : ' open tasks');
+    const badge = $('#nav-task-count');
+    badge.textContent = String(open);
+    badge.hidden = open === 0;
+  }
+
+  function projectCaption(p) {
+    if (p.pct === 100) return 'Delivered ✓';
+    if (p.pct === 0) return 'Not started';
+    return p.type === 'study' ? 'Week 2/3' : 'Phase ' + phaseOf(p.pct) + '/7';
+  }
+
+  function renderProjects() {
+    $('#proj-mount').innerHTML = state.projects.map((p) => {
+      const fill = p.pct >= 75 ? 'p-fill-success' : p.type === 'study' ? 'p-fill-warning' : 'p-fill-brand';
+      return '<div class="proj-card" data-project="' + p.id + '">' +
+        '<div class="proj-card-top"><div class="proj-dot-box" style="background:' + p.color + ';"></div>' +
+        '<div><div class="proj-name">' + esc(p.name) + '</div><div class="proj-type">' + esc(p.type) + '</div></div></div>' +
+        '<div class="progress-bar" role="progressbar" aria-valuenow="' + p.pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="' + esc(p.name) + ' progress"><div class="progress-fill ' + fill + '" style="width:' + p.pct + '%;"></div></div>' +
+        '<div class="flex justify-between" style="margin-top:5px;"><span class="text-xs text-muted">' + projectCaption(p) + '</span><span class="text-xs text-muted">' + p.pct + '%</span></div></div>';
+    }).join('');
+
+    const active = state.projects.filter((p) => p.pct < 100);
+    const counts = {};
+    active.forEach((p) => { counts[p.type] = (counts[p.type] || 0) + 1; });
+    const delivered = state.projects.length - active.length;
+    const parts = Object.entries(counts).map(([t, n]) => n + ' ' + t);
+    if (delivered) parts.push(delivered + ' delivered');
+    $('#stat-projects').textContent = String(active.length);
+    $('#stat-projects-sub').textContent = parts.join(' · ') || 'No projects yet';
+
+    $$('[data-proj-list]').forEach((mount) => {
+      mount.innerHTML = state.projects.map((p) =>
+        '<div class="proj-item' + (p.id === state.activeProject ? ' active' : '') + '" data-project="' + p.id + '"><div class="proj-dot" style="background:' + p.color + ';"></div> ' + esc(p.name) + '</div>'
+      ).join('');
+    });
+    enhance();
+  }
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function renderHeatmap() {
+    const rnd = mulberry32(2026);
+    let out = '';
+    for (let w = 0; w < 12; w++) {
+      out += '<div class="hm-col">';
+      for (let d = 0; d < 7; d++) {
+        const r = rnd();
+        const lvl = r > .85 ? 4 : r > .65 ? 3 : r > .42 ? 2 : r > .28 ? 1 : 0;
+        out += '<div class="hm-cell' + (lvl ? ' hm-' + lvl : '') + '" title="' + (lvl * 2) + ' updates"></div>';
+      }
+      out += '</div>';
+    }
+    $('#heatmap-cells').innerHTML = out;
+  }
+
+  function renderRecentNotes() {
+    $('#recent-notes').innerHTML = state.notes.slice(0, 3).map((n) =>
+      '<div class="note-item" data-note-open="' + n.id + '"><span aria-hidden="true">' + n.icon + '</span><span class="note-title">' + esc(n.title) + '</span><span class="note-time">' + esc(n.when) + '</span></div>'
+    ).join('') || '<div class="empty-note">No notes yet.</div>';
+    $('#stat-notes').textContent = String(state.notes.length);
+    enhance();
+  }
+
+  /* ───────────── kanban ───────────── */
+  const dueIcon = (c, col) => (col.done ? '✓' : (c.over || c.due === 'Today') ? '⏰' : '📅');
+  const matchesFilter = (c) => state.filter === 'all' || (state.filter === 'today' && c.due === 'Today') || (state.filter === 'high' && (c.priority === 'urgent' || c.priority === 'high'));
+
+  function cardHtml(c, col) {
+    const tagCls = col.done ? 'badge-gray' : col.badge;
+    const lead = col.done ? '<span class="badge badge-success">done</span>' : '<span class="priority p-' + c.priority + '">' + c.priority + '</span>';
+    return '<div class="k-card' + (col.done ? ' is-done' : '') + '" draggable="true" data-card="' + c.id + '" role="button" tabindex="0" aria-label="Open card: ' + esc(c.title) + '">' +
+      '<div class="k-card-accent" style="background:' + col.accent + ';"></div><div class="k-card-inner">' +
+      '<div class="k-card-title">' + esc(c.title) + '</div>' +
+      '<div class="k-card-tags">' + lead + c.tags.map((t) => '<span class="badge ' + tagCls + '">' + esc(t) + '</span>').join('') + '</div>' +
+      '<div class="k-card-footer"><span class="k-card-due' + (c.over && !col.done ? ' over' : '') + '">' + dueIcon(c, col) + ' ' + esc(c.due || 'No date') + '</span><div class="k-avatar">' + esc(state.user.initials) + '</div></div></div></div>';
+  }
+
+  function composerHtml(col) {
+    return '<form class="composer" data-composer="' + col.id + '"><textarea rows="2" aria-label="New card title in ' + esc(col.title) + '" placeholder="Card title…"></textarea>' +
+      '<div class="composer-actions"><button type="submit" class="btn btn-primary btn-sm">Add card</button><button type="button" class="btn btn-ghost btn-sm" data-composer-cancel>Cancel</button></div></form>';
+  }
+
+  function renderBoard() {
+    const b = board();
+    const p = project();
+    $('#board-title').textContent = p.name;
+    $('#crumb-project').textContent = p.name;
+    const ws = workspace();
+    const crumbFirst = $('#screen-kanban .topbar-breadcrumb span');
+    if (crumbFirst) crumbFirst.textContent = ws.name;
+    $('#board-meta').textContent = p.type + ' · ' + b.columns.length + ' columns · ' + b.cards.length + ' cards' +
+      (p.type !== 'study' && p.pct > 0 ? ' · Phase ' + phaseOf(p.pct) + ' of 7 — ' + p.pct + '% complete' : '');
+
+    $('#board-cols-mount').innerHTML = b.columns.map((col) => {
+      const cards = b.cards.filter((c) => c.col === col.id && matchesFilter(c));
+      const composing = state.composing && state.composing.col === col.id;
+      let body = cards.map((c) => cardHtml(c, col)).join('');
+      if (!cards.length && !composing) body += '<div class="col-empty">' + (state.filter === 'all' ? 'No cards yet' : 'No matching cards') + '</div>';
+      if (composing) body += composerHtml(col);
+      else if (!col.done) body += '<button type="button" class="add-card" data-add-to="' + col.id + '">＋ Add card</button>';
+      return '<div class="kanban-col ' + col.cls + '" data-col="' + col.id + '">' +
+        '<div class="kanban-col-header"><span class="col-title">' + esc(col.title) + '</span><span class="col-count">' + cards.length + '</span>' +
+        '<button type="button" class="col-add" data-add-to="' + col.id + '" aria-label="Add card to ' + esc(col.title) + '">＋</button></div>' +
+        '<div class="kanban-col-body" data-drop="' + col.id + '">' + body + '</div></div>';
+    }).join('') + (state.composing && state.composing.newCol
+      ? '<form class="add-col composer-col composer" data-composer-col><input type="text" aria-label="New column name" placeholder="Column name…" /><div class="composer-actions"><button type="submit" class="btn btn-primary btn-sm">Add column</button><button type="button" class="btn btn-ghost btn-sm" data-composer-cancel>Cancel</button></div></form>'
+      : '<button type="button" class="add-col" data-add-col>＋ Add column</button>');
+
+    renderList();
+    $$('.filter-chip').forEach((c) => { const on = c.dataset.filter === state.filter; c.classList.toggle('active', on); c.setAttribute('aria-pressed', String(on)); });
+    $$('.view-btn').forEach((v) => { const on = v.dataset.view === state.view; v.classList.toggle('active', on); v.setAttribute('aria-pressed', String(on)); });
+    $('#board-scroll').hidden = state.view !== 'board';
+    $('#list-view').hidden = state.view !== 'list';
+    if (state.composing) {
+      requestAnimationFrame(() => { const f = $('.composer textarea,.composer input'); if (f) f.focus(); });
+    }
+    enhance();
+  }
+
+  function renderList() {
+    const b = board();
+    const groups = b.columns.map((col) => {
+      const cards = b.cards.filter((c) => c.col === col.id && matchesFilter(c));
+      return '<section class="list-group"><h3><span class="ws-dot" style="background:' + col.accent + ';"></span>' + esc(col.title) + ' <span class="col-count">' + cards.length + '</span></h3>' +
+        (cards.length ? cards.map((c) =>
+          '<button type="button" class="list-row' + (col.done ? ' is-done' : '') + '" data-card="' + c.id + '">' +
+          '<span class="list-title"><span class="list-title-text">' + esc(c.title) + '</span><span class="list-tags">' + c.tags.map((t) => '<span class="badge badge-gray">' + esc(t) + '</span>').join('') + '</span></span>' +
+          (col.done ? '<span class="badge badge-success">done</span>' : '<span class="priority p-' + c.priority + '">' + c.priority + '</span>') +
+          '<span class="k-card-due' + (c.over && !col.done ? ' over' : '') + '">' + dueIcon(c, col) + ' ' + esc(c.due || 'No date') + '</span>' +
+          '<span class="k-avatar">' + esc(state.user.initials) + '</span></button>').join('')
+          : '<div class="col-empty">' + (state.filter === 'all' ? 'No cards yet' : 'No matching cards') + '</div>') + '</section>';
+    });
+    $('#list-view').innerHTML = groups.join('');
+  }
+
+  function openProject(pid) {
+    if (!project(pid)) return;
+    state.activeProject = pid;
+    state.composing = null;
+    renderProjects();
+    renderBoard();
+    go('kanban');
+  }
+
+  function addCardTo(colId) {
+    state.composing = { col: colId };
+    if (state.view !== 'board') state.view = 'board';
+    renderBoard();
+  }
+
+  function moveCard(cid, colId, beforeId) {
+    const found = findCard(cid);
+    if (!found) return;
+    const b = found.board;
+    const c = found.card;
+    const from = c.col;
+    b.cards.splice(b.cards.indexOf(c), 1);
+    c.col = colId;
+    const beforeIdx = beforeId ? b.cards.findIndex((x) => x.id === beforeId) : -1;
+    if (beforeIdx >= 0) b.cards.splice(beforeIdx, 0, c); else b.cards.push(c);
+    if (from !== colId) {
+      const col = b.columns.find((x) => x.id === colId);
+      toast('Moved to ' + col.title);
+    }
+    renderBoard();
+  }
+
+  /* ───────────── card slide-over ───────────── */
+  let soDirty = false;
+  let soReturnFocus = null;
+  const soEl = () => document.getElementById('slideover');
+
+  function setSoDirty(v) {
+    soDirty = v;
+    const t = $('#so-status-text');
+    t.textContent = v ? 'Unsaved changes' : 'Updated 2h ago';
+    t.dataset.dirty = String(v);
+  }
+  function paintPrioritySelect() {
+    const sel = $('#so-priority');
+    sel.className = 'meta-select priority p-' + sel.value;
+  }
+  function renderSoTags(c) {
+    $('#so-tags').innerHTML = c.tags.map((t) =>
+      '<span class="badge badge-brand">' + esc(t) + ' <button type="button" class="chip-x" data-so-remove-tag="' + esc(t) + '" aria-label="Remove tag ' + esc(t) + '" style="background:none;border:0;color:inherit;cursor:pointer;padding:0 0 0 2px;font:inherit;">×</button></span>'
+    ).join('');
+  }
+  function openCard(cid) {
+    const found = findCard(cid);
+    if (!found) return;
+    const c = found.card;
+    state.openCardId = cid;
+    soReturnFocus = document.activeElement;
+    $('#so-title').value = c.title;
+    $('#so-status').innerHTML = found.board.columns.map((col) => '<option value="' + col.id + '"' + (col.id === c.col ? ' selected' : '') + '>' + esc(col.title) + '</option>').join('');
+    $('#so-priority').value = c.priority;
+    paintPrioritySelect();
+    const due = $('#so-due');
+    due.value = c.due === 'No date' ? '' : c.due;
+    due.dataset.over = String(!!c.over);
+    $('#so-editor').innerHTML = c.desc || '';
+    renderSoTags(c);
+    const files = c.files || [];
+    $('#so-attach').textContent = '📎 ' + files.length + (files.length === 1 ? ' attachment' : ' attachments');
+    setSoDirty(false);
+    soEl().style.display = 'flex';
+    $('#slideover-backdrop').style.display = 'block';
+    soEl().dataset.card = cid;
+    setTimeout(() => $('.slideover-close', soEl()).focus(), 0);
+  }
+  function closeSlideover() {
+    soEl().style.display = 'none';
+    $('#slideover-backdrop').style.display = 'none';
+    const cid = state.openCardId;
+    state.openCardId = null;
+    if (cid) {
+      const el = $('[data-card="' + cid + '"]');
+      if (el && el.offsetParent !== null) el.focus();
+      else if (soReturnFocus && document.contains(soReturnFocus)) soReturnFocus.focus();
+    }
+  }
+  function saveCard() {
+    const found = findCard(state.openCardId);
+    if (!found) return;
+    const c = found.card;
+    const title = $('#so-title').value.trim();
+    if (!title) { toast('A card needs a title.'); $('#so-title').focus(); return; }
+    c.title = title;
+    c.priority = $('#so-priority').value;
+    c.due = $('#so-due').value.trim();
+    c.over = /overdue/i.test(c.due);
+    c.desc = $('#so-editor').innerHTML;
+    const newCol = $('#so-status').value;
+    if (newCol !== c.col) {
+      found.board.cards.splice(found.board.cards.indexOf(c), 1);
+      c.col = newCol;
+      found.board.cards.push(c);
+    }
+    setSoDirty(false);
+    renderBoard();
+    closeSlideover();
+    toast('Card saved');
+  }
+  function deleteCard() {
+    const found = findCard(state.openCardId);
+    if (!found) return;
+    const c = found.card;
+    const idx = found.board.cards.indexOf(c);
+    found.board.cards.splice(idx, 1);
+    closeSlideover();
+    renderBoard();
+    toast('Card deleted', { action: 'Undo', onAction: () => { found.board.cards.splice(idx, 0, c); renderBoard(); } });
+  }
+
+  /* ───────────── notes ───────────── */
+  function filteredNotes() {
+    const f = state.notesFilter;
+    if (f === 'all') return state.notes;
+    if (f === 'pinned') return state.notes.filter((n) => n.pinned);
+    return state.notes.filter((n) => n.folder === f || topFolder(n.folder) === f);
+  }
+  function renderFolders() {
+    const f = state.notesFilter;
+    const item = (key, icon, label, extra) =>
+      '<div class="folder-item' + (f === key ? ' active' : '') + '" data-nfilter="' + esc(key) + '"' + (extra || '') + '><span class="folder-icon" aria-hidden="true">' + icon + '</span> ' + esc(label) + '</div>';
+    $('#folder-tree').innerHTML = item('all', '📝', 'All Notes') + item('pinned', '📌', 'Pinned') +
+      '<div class="sidebar-divider" style="margin:6px 0;"></div><div class="sidebar-label" style="padding-top:0;">Folders</div>' +
+      state.folders.map((fo) => item(fo.name, '📂', fo.name) +
+        (fo.children.length ? '<div class="folder-sub">' + fo.children.map((ch) => item(ch, '📄', ch)).join('') + '</div>' : '')).join('');
+    enhance();
+  }
+  function renderNotesList() {
+    const list = filteredNotes();
+    const f = state.notesFilter;
+    $('#notes-list-title').textContent = f === 'all' ? 'All Notes' : f === 'pinned' ? 'Pinned' : f;
+    $('#notes-list-count').textContent = list.length + (list.length === 1 ? ' note' : ' notes');
+    $('#note-list').innerHTML = list.length ? list.map((n) =>
+      '<div class="note-list-item' + (n.id === state.activeNote ? ' active' : '') + '" data-note="' + n.id + '" role="button" tabindex="0">' +
+      '<div class="flex items-center gap-2"><span style="font-size:13px;" aria-hidden="true">' + n.icon + '</span><span class="note-list-title">' + esc(n.title || 'Untitled note') + '</span>' + (n.pinned ? '<span title="Pinned" aria-label="Pinned">📌</span>' : '') + '</div>' +
+      '<div class="note-list-preview">' + esc(n.preview) + '</div><div class="note-list-meta">' + esc(n.when) + '</div></div>'
+    ).join('') : '<div class="empty-note">No notes here yet.</div>';
+    renderFolders();
+  }
+  function renderNoteTags(n) {
+    $('#note-tags').innerHTML = n.tags.map((t) =>
+      '<span class="note-tag-chip"><button type="button" class="chip-label" data-tag-search="' + esc(t) + '" title="Search notes tagged ' + esc(t) + '">' + esc(t) + '</button>' +
+      '<button type="button" class="chip-x" data-remove-tag="' + esc(t) + '" aria-label="Remove tag ' + esc(t) + '">×</button></span>'
+    ).join('') + '<button type="button" class="note-tag-add" data-action="add-tag">＋ tag</button>';
+  }
+  function autosizeTitle() {
+    const t = $('#note-title');
+    t.style.height = 'auto';
+    t.style.height = t.scrollHeight + 'px';
+  }
+  function renderNote() {
+    const n = noteById(state.activeNote);
+    $('#note-empty').hidden = !!n;
+    $('#note-editor-body').hidden = !n;
+    if (!n) { $('#note-crumb').textContent = 'Notes'; return; }
+    $('#note-crumb').innerHTML = 'Notes / ' + esc(topFolder(n.folder)) + ' / <span>' + esc(n.title || 'Untitled note') + '</span>';
+    $('#note-title').value = n.title;
+    $('#note-body').innerHTML = n.body;
+    $('#note-status').textContent = n.pinned ? 'Pinned' : 'Auto-saved just now';
+    renderNoteTags(n);
+    autosizeTitle();
+  }
+  function selectNote(id) {
+    state.activeNote = id;
+    renderNotesList();
+    renderNote();
+  }
+  function openNotes(filter, noteId) {
+    state.notesFilter = filter || state.notesFilter;
+    const list = filteredNotes();
+    state.activeNote = noteId || (list.some((n) => n.id === state.activeNote) ? state.activeNote : (list[0] && list[0].id) || null);
+    renderNotesList();
+    renderNote();
+    go('notes');
+  }
+  function openNote(id) {
+    const n = noteById(id);
+    if (!n) return;
+    if (!filteredNotes().some((x) => x.id === id)) state.notesFilter = 'all';
+    openNotes(state.notesFilter, id);
+  }
+  function createNote(init) {
+    const folder = (state.notesFilter !== 'all' && state.notesFilter !== 'pinned') ? state.notesFilter : 'Personal';
+    const n = Object.assign({ id: uid('n'), title: '', icon: '📝', when: 'Just now', folder, pinned: false, tags: [], preview: '', body: '<p><br></p>' }, init || {});
+    state.notes.unshift(n);
+    renderRecentNotes();
+    return n;
+  }
+  let saveTimer = null;
+  function noteEdited() {
+    const n = noteById(state.activeNote);
+    if (!n) return;
+    $('#note-status').textContent = 'Saving…';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { $('#note-status').textContent = 'Auto-saved just now'; n.when = 'Just now'; }, 700);
+  }
+
+  /* ───────────── references ───────────── */
+  function renderRefs() {
+    $('#ref-list').innerHTML = state.refs.map((r) =>
+      '<button type="button" class="ref-item" data-ref="' + r.id + '" title="Copy citation"><div class="ref-item-title">' + esc(r.title) + '</div><div class="ref-item-meta">' + esc(r.meta) + '</div></button>').join('');
+  }
+
+  /* ───────────── workspaces & settings ───────────── */
+  function renderWorkspaces() {
+    const ws = workspace();
+    $$('.ws-chip').forEach((chip) => {
+      const nm = $('.ws-name', chip), ty = $('.ws-type', chip), dot = $('.ws-dot', chip);
+      if (nm) nm.textContent = ws.name;
+      if (ty) ty.textContent = ws.type;
+      if (dot) dot.style.background = ws.color;
+      chip.setAttribute('aria-haspopup', 'true');
+    });
+    $('#ws-list-mount').innerHTML = state.workspaces.map((w) =>
+      '<div class="ws-list-item"><div class="ws-list-icon" style="background:var(--surface-overlay);" aria-hidden="true">' + w.icon + '</div>' +
+      '<div style="flex:1;min-width:0;"><div class="ws-list-name">' + esc(w.name) + '</div><div class="ws-list-meta">' + esc(w.meta) + '</div></div>' +
+      '<span class="ws-list-badge ws-badge-' + w.type + '">' + esc(w.type) + '</span>' +
+      '<button type="button" class="avatar-btn" data-ws-edit="' + w.id + '" style="margin-left:10px;" aria-label="Edit ' + esc(w.name) + '">Edit</button></div>').join('');
+    renderBoard();
+  }
+
+  const NOTIF_ROWS = [
+    ['nt-due', 'Task due reminders', 'Get notified when tasks are due today or overdue', true],
+    ['nt-streak', 'Study streak reminder', 'Daily nudge to keep your study streak alive', true],
+    ['nt-weekly', 'Weekly summary email', 'Digest of tasks completed and notes written each week', false],
+    ['nt-mention', 'Mention alerts', 'Notify when someone mentions you in a shared workspace', false],
+  ];
+  const toggleHtml = (id, label, on) => '<label class="toggle"><input type="checkbox" id="' + id + '" aria-label="' + esc(label) + '"' + (on ? ' checked' : '') + ' /><div class="toggle-track"></div><div class="toggle-thumb"></div></label>';
+  function renderSettingsRows() {
+    $('#notif-rows').innerHTML = NOTIF_ROWS.map(([id, label, desc, on]) =>
+      '<div class="settings-row"><div class="settings-row-info"><div class="settings-row-label">' + label + '</div><div class="settings-row-desc">' + desc + '</div></div>' + toggleHtml(id, label, on) + '</div>').join('');
+    const row = (id, label, desc, control) => '<div class="settings-row"' + (id ? ' id="' + id + '"' : '') + '><div class="settings-row-info"><div class="settings-row-label">' + label + '</div><div class="settings-row-desc">' + desc + '</div></div>' + control + '</div>';
+    $('#appearance-rows').innerHTML =
+      row('', 'Theme', 'Interface color mode', '<select class="s-select" id="sel-theme" aria-label="Theme"><option value="system">System default</option><option value="light">Light</option><option value="dark" selected>Dark</option></select>') +
+      row('set-language', 'Language', 'Interface language', '<select class="s-select" id="sel-lang" aria-label="Language"><option value="en" selected>English</option><option value="bn">বাংলা (Bangla)</option></select>') +
+      row('', 'Compact sidebar', 'Collapse sidebar to icon-only mode', toggleHtml('tg-compact', 'Compact sidebar', false)) +
+      row('', 'Show project colors', 'Color-coded dots in sidebar', toggleHtml('tg-projcolors', 'Show project colors', true));
+  }
+
+  const settingsControls = () => $$('#screen-settings input:not([type="file"]):not([type="password"]), #screen-settings select');
+  let settingsSnapshot = null;
+  function captureSettings() {
+    return {
+      controls: settingsControls().map((el) => (el.type === 'checkbox' ? el.checked : el.value)),
+      personas: $$('#screen-settings .persona-card').map((c) => c.classList.contains('active')),
+    };
+  }
+  function restoreSettings(snap) {
+    settingsControls().forEach((el, i) => { if (el.type === 'checkbox') el.checked = !!snap.controls[i]; else el.value = snap.controls[i]; });
+    $$('#screen-settings .persona-card').forEach((c, i) => { c.classList.toggle('active', !!snap.personas[i]); c.setAttribute('aria-pressed', String(!!snap.personas[i])); });
+    applyAppearance();
+  }
+  function applyAppearance() {
+    applyTheme($('#sel-theme').value, true);
+    document.body.classList.toggle('compact-sidebar', $('#tg-compact').checked);
+    document.body.classList.toggle('hide-proj-colors', !$('#tg-projcolors').checked);
+    document.documentElement.lang = $('#sel-lang').value;
+  }
+
+  /* ───────────── theme ───────────── */
+  function effectiveTheme(pref) {
+    if (pref === 'system') return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    return pref;
+  }
+  function applyTheme(pref, fromSettings) {
+    state.themePref = pref;
+    const eff = effectiveTheme(pref);
+    document.documentElement.setAttribute('data-theme', eff);
+    const meta = $('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', eff === 'light' ? '#e8eaf4' : '#080810');
+    $$('.theme-btn').forEach((b) => {
+      b.textContent = eff === 'dark' ? '🌙' : '☀️';
+      b.setAttribute('aria-label', eff === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    });
+    const sel = $('#sel-theme');
+    if (sel && !fromSettings) sel.value = pref;
+    try { localStorage.setItem('flowdesk-theme', pref); } catch (e) { /* storage unavailable */ }
+  }
+  function toggleTheme() {
+    applyTheme(effectiveTheme(state.themePref) === 'dark' ? 'light' : 'dark');
+    snapshotSettingsSoon();
+  }
+  function snapshotSettingsSoon() { settingsSnapshot = captureSettings(); }
+
+  /* ───────────── command palette (global search) ───────────── */
+  function paletteEntries() {
+    const out = [];
+    const screens = [['dashboard', 'Dashboard', '🏠'], ['kanban', 'Kanban board', '📋'], ['notes', 'Notes', '📝'], ['settings', 'Settings', '⚙️']];
+    screens.forEach(([id, label, icon]) => out.push({ group: 'Jump to', icon, title: label, hint: 'Screen', run: () => go(id) }));
+    out.push({ group: 'Actions', icon: '＋', title: 'New note', hint: 'Action', run: () => newNote() });
+    out.push({ group: 'Actions', icon: '＋', title: 'Add card to current board', hint: 'Action', run: () => { go('kanban'); addCardTo('todo'); } });
+    out.push({ group: 'Actions', icon: '🌓', title: 'Toggle theme', hint: 'Action', run: () => toggleTheme() });
+    state.projects.forEach((p) => out.push({ group: 'Projects', icon: '🗂', title: p.name, hint: p.type, run: () => openProject(p.id) }));
+    Object.entries(state.boards).forEach(([pid, b]) => {
+      const p = project(pid);
+      b.cards.forEach((c) => out.push({ group: 'Cards', icon: '▫️', title: c.title, hint: p ? p.name : 'Card', extra: c.tags.join(' '), run: () => { state.activeProject = pid; renderProjects(); renderBoard(); go('kanban'); openCard(c.id); } }));
+    });
+    state.notes.forEach((n) => out.push({ group: 'Notes', icon: n.icon, title: n.title || 'Untitled note', hint: 'Note', extra: n.tags.join(' ') + ' ' + n.preview, run: () => openNote(n.id) }));
+    return out;
+  }
+  function openPalette(initial) {
+    const entries = paletteEntries();
+    const m = openModal('<div class="modal palette" aria-label="Search"><input class="palette-input" type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-label="Search cards, notes and projects" placeholder="Search cards, notes, projects…" autocomplete="off" />' +
+      '<div class="palette-list" id="palette-list" role="listbox"></div><div class="palette-foot"><span>↑↓ to move</span><span>Enter to open</span><span>Esc to close</span></div></div>');
+    const input = $('.palette-input', m.dialog);
+    const list = $('.palette-list', m.dialog);
+    let shown = [];
+    let sel = 0;
+    function paint() {
+      const q = input.value.trim().toLowerCase();
+      shown = q
+        ? entries.filter((e) => (e.title + ' ' + (e.extra || '')).toLowerCase().includes(q)).slice(0, 14)
+        : entries.filter((e) => e.group === 'Jump to' || e.group === 'Actions' || e.group === 'Projects').slice(0, 12);
+      sel = Math.min(sel, Math.max(0, shown.length - 1));
+      if (!shown.length) { list.innerHTML = '<div class="palette-empty">No results for “' + esc(input.value.trim()) + '”. Try a card title, tag or note name.</div>'; return; }
+      let last = '';
+      list.innerHTML = shown.map((e, i) => {
+        const head = e.group !== last ? '<div class="palette-group">' + esc(e.group) + '</div>' : '';
+        last = e.group;
+        return head + '<button type="button" class="palette-item" role="option" id="pi-' + i + '" data-i="' + i + '" aria-selected="' + (i === sel) + '"><span aria-hidden="true">' + e.icon + '</span><span class="pi-title">' + esc(e.title) + '</span><span class="pi-kind">' + esc(e.hint) + '</span></button>';
+      }).join('');
+      input.setAttribute('aria-activedescendant', 'pi-' + sel);
+    }
+    function choose(i) { const e = shown[i]; if (!e) return; m.close(); setTimeout(e.run, 0); }
+    input.addEventListener('input', () => { sel = 0; paint(); });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(shown.length - 1, sel + 1); paint(); const a = $('#pi-' + sel, list); if (a) a.scrollIntoView({ block: 'nearest' }); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, sel - 1); paint(); const a = $('#pi-' + sel, list); if (a) a.scrollIntoView({ block: 'nearest' }); }
+      else if (e.key === 'Enter') { e.preventDefault(); choose(sel); }
+    });
+    list.addEventListener('click', (e) => { const it = e.target.closest('.palette-item'); if (it) choose(Number(it.dataset.i)); });
+    list.addEventListener('mousemove', (e) => { const it = e.target.closest('.palette-item'); if (it && Number(it.dataset.i) !== sel) { sel = Number(it.dataset.i); $$('.palette-item', list).forEach((x, i) => x.setAttribute('aria-selected', String(i === sel))); } });
+    if (initial) input.value = initial;
+    paint();
+  }
+
+  /* ───────────── rich-text commands (prototype only: the real app uses TipTap) ───────────── */
+  const TOOLBAR_LABELS = { B: ['bold', 'Bold'], I: ['italic', 'Italic'], U: ['underline', 'Underline'], S: ['strikeThrough', 'Strikethrough'], H1: ['h1', 'Heading 1'], H2: ['h2', 'Heading 2'], H3: ['h3', 'Heading 3'], '≡': ['ul', 'Bullet list'], '①': ['ol', 'Numbered list'], '☑': ['check', 'Checklist'], '</>': ['code', 'Code'], '🔗': ['link', 'Link'], '📎': ['attach', 'Attach file'] };
+  const INLINE = ['bold', 'italic', 'underline', 'strikeThrough'];
+  function setupToolbars() {
+    $$('.toolbar-btn').forEach((btn) => {
+      const def = TOOLBAR_LABELS[btn.textContent.trim()];
+      if (!def) return;
+      btn.dataset.cmd = def[0];
+      btn.title = def[1];
+      btn.setAttribute('aria-label', def[1]);
+      if (INLINE.includes(def[0])) btn.setAttribute('aria-pressed', 'false');
+      btn.classList.remove('active');
+    });
+  }
+  const editorFor = (toolbar) => (toolbar.classList.contains('float-toolbar') ? $('#note-body') : $('#so-editor'));
+  let savedRange = null;
+  const saveSel = () => { const s = window.getSelection(); savedRange = s && s.rangeCount ? s.getRangeAt(0).cloneRange() : null; };
+  const restoreSel = () => { if (!savedRange) return; const s = window.getSelection(); s.removeAllRanges(); s.addRange(savedRange); };
+  const exec = (cmd, val) => { try { document.execCommand(cmd, false, val); } catch (e) { /* unsupported */ } };
+
+  async function runCommand(cmd, toolbar) {
+    const ed = editorFor(toolbar);
+    if (!ed) return;
+    ed.focus();
+    const map = toolbar.classList.contains('float-toolbar') ? { h1: 'h2', h2: 'h2', h3: 'h3' } : { h1: 'h2', h2: 'h3' };
+    if (INLINE.includes(cmd)) exec(cmd);
+    else if (map[cmd]) {
+      const cur = (document.queryCommandValue ? document.queryCommandValue('formatBlock') : '').toLowerCase();
+      exec('formatBlock', cur === map[cmd] ? 'p' : map[cmd]);
+    }
+    else if (cmd === 'ul') exec('insertUnorderedList');
+    else if (cmd === 'ol') exec('insertOrderedList');
+    else if (cmd === 'check') exec('insertHTML', '<ul class="checklist"><li><label><input type="checkbox"> To do</label></li></ul>');
+    else if (cmd === 'code') {
+      const text = (window.getSelection() || '').toString();
+      exec('insertHTML', '<code>' + esc(text || 'code') + '</code>');
+    }
+    else if (cmd === 'link') {
+      saveSel();
+      const v = await formDialog({ title: 'Add link', fields: [{ name: 'url', label: 'Link address', placeholder: 'https://', value: 'https://' }], confirm: 'Add link' });
+      if (v) { ed.focus(); restoreSel(); exec('createLink', v.url); }
+    }
+    else if (cmd === 'attach') {
+      if (ed.id === 'so-editor') $('#so-file').click(); else toast('Attachments are available on cards.');
+    }
+    ed.dispatchEvent(new Event('input', { bubbles: true }));
+    syncToolbarState();
+  }
+  function syncToolbarState() {
+    if (typeof document.queryCommandState !== 'function') return;
+    $$('.toolbar-btn[data-cmd]').forEach((btn) => {
+      if (!INLINE.includes(btn.dataset.cmd)) return;
+      let on = false;
+      try {
+        const ed = editorFor(btn.parentElement);
+        const sel = window.getSelection();
+        on = !!(ed && sel && sel.anchorNode && ed.contains(sel.anchorNode) && document.queryCommandState(btn.dataset.cmd));
+      } catch (e) { on = false; }
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', String(on));
+    });
+  }
+
+  /* ───────────── accessibility helper for non-button interactive items ───────────── */
+  const ENHANCE_SELECTOR = '.sidebar-item,.proj-item,.folder-item,.sidebar-add,.ws-chip,.filter-chip,.proj-card,.note-item,.settings-nav-item,.persona-card,.auth-persona-card';
+  function enhance(root) {
+    $$(ENHANCE_SELECTOR, root || document).forEach((el) => {
+      if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
+      if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+      if (el.matches('.filter-chip,.persona-card,.auth-persona-card') && !el.hasAttribute('aria-pressed')) {
+        el.setAttribute('aria-pressed', String(el.classList.contains('active') || el.classList.contains('selected')));
+      }
+    });
+  }
+
+  /* ───────────── actions ───────────── */
+  async function newNote() {
+    const n = createNote();
+    state.activeNote = n.id;
+    state.notesFilter = state.notesFilter === 'pinned' ? 'all' : state.notesFilter;
+    renderNotesList();
+    renderNote();
+    go('notes');
+    setTimeout(() => { const t = $('#note-title'); t.focus(); }, 0);
+  }
+
+  async function newProject() {
+    const v = await formDialog({ title: 'New project', fields: [
+      { name: 'name', label: 'Project name', placeholder: 'e.g. Portfolio redesign' },
+      { name: 'type', label: 'Type', type: 'select', value: 'kanban', options: [{ value: 'kanban', label: 'Kanban (work)' }, { value: 'study', label: 'Study plan' }, { value: 'research', label: 'Research' }] },
+    ], confirm: 'Create project' });
+    if (!v) return;
+    const palette = ['#06b6d4', '#ec4899', '#84cc16', '#f97316', '#14b8a6'];
+    const p = { id: uid('p'), name: v.name, type: v.type, color: palette[state.projects.length % palette.length], pct: 0 };
+    state.projects.push(p);
+    renderProjects();
+    toast('Created “' + p.name + '”', { action: 'Open', onAction: () => openProject(p.id) });
+  }
+  async function newWorkspace() {
+    const v = await formDialog({ title: 'New workspace', sub: 'Workspaces group boards and notes by context.', fields: [
+      { name: 'name', label: 'Workspace name', placeholder: 'e.g. Job Search' },
+      { name: 'type', label: 'Type', type: 'select', value: 'work', options: ['work', 'study', 'research'] },
+    ], confirm: 'Create workspace' });
+    if (!v) return;
+    const icons = { work: '💻', study: '📚', research: '🔬' };
+    const colors = { work: '#4f46e5', study: '#10b981', research: '#8b5cf6' };
+    const w = { id: uid('w'), name: v.name, type: v.type, icon: icons[v.type], color: colors[v.type], meta: '0 projects · 0 cards' };
+    state.workspaces.push(w);
+    renderWorkspaces();
+    toast('Created workspace “' + w.name + '”');
+  }
+  async function newFolder() {
+    const v = await formDialog({ title: 'New folder', fields: [{ name: 'name', label: 'Folder name', placeholder: 'e.g. Reading list' }], confirm: 'Create folder',
+      check: (x) => (state.folders.some((f) => f.name.toLowerCase() === x.name.toLowerCase()) ? 'A folder with that name already exists.' : '') });
+    if (!v) return;
+    state.folders.push({ name: v.name, children: [] });
+    renderFolders();
+    toast('Created folder “' + v.name + '”');
+  }
+
+  function workspaceMenu(anchor) {
+    openPopover(anchor,
+      '<div class="pop-head">Switch workspace</div>' +
+      state.workspaces.map((w) => '<button type="button" class="pop-item" role="menuitemradio" aria-checked="' + (w.id === state.activeWorkspace) + '" data-pop="ws:' + w.id + '"><span aria-hidden="true">' + w.icon + '</span> ' + esc(w.name) + '</button>').join('') +
+      '<div class="pop-sep"></div><button type="button" class="pop-item" data-pop="new">＋ New workspace</button>',
+      { align: 'left', onSelect: (act) => {
+        closePopover();
+        if (act === 'new') newWorkspace();
+        else { state.activeWorkspace = act.slice(3); renderWorkspaces(); toast('Switched to ' + workspace().name); }
+      } });
+  }
+
+  function notificationsMenu(anchor) {
+    const unread = state.notifs.filter((n) => n.unread).length;
+    openPopover(anchor,
+      '<div class="pop-head"><span>Notifications' + (unread ? ' <span class="pop-sub">(' + unread + ' new)</span>' : '') + '</span><button type="button" data-pop="read-all">Mark all read</button></div>' +
+      state.notifs.map((n) => '<button type="button" class="pop-note' + (n.unread ? ' unread' : '') + '" data-pop="nf:' + n.id + '"><span aria-hidden="true">' + n.icon + '</span><span>' + esc(n.text) + '<span class="pn-when">' + esc(n.when) + '</span></span></button>').join(''),
+      { onSelect: (act) => {
+        if (act === 'read-all') { state.notifs.forEach((n) => { n.unread = false; }); paintBell(); closePopover(); toast('All caught up'); return; }
+        const n = state.notifs.find((x) => 'nf:' + x.id === act);
+        if (!n) return;
+        n.unread = false; paintBell(); closePopover();
+        if (n.go === 'dashboard') go('dashboard');
+        else if (n.go.startsWith('card:')) { const c = cardByKey(n.go.slice(5)); if (c) { state.activeProject = 'p-flowdesk'; renderProjects(); renderBoard(); go('kanban'); openCard(c.id); } }
+      } });
+  }
+  function paintBell() {
+    const any = state.notifs.some((n) => n.unread);
+    $$('.notif-badge').forEach((b) => { b.hidden = !any; });
+  }
+
+  function avatarMenu(anchor) {
+    openPopover(anchor,
+      '<div class="pop-head" style="display:block;"><div>' + esc($('#set-name').value || state.user.first) + '</div><div class="pop-sub">' + esc($('#set-email').value) + '</div></div><div class="pop-sep"></div>' +
+      '<button type="button" class="pop-item" data-pop="profile">👤 Profile settings</button>' +
+      '<button type="button" class="pop-item" data-pop="search">🔍 Search <span class="pop-sub" style="margin-left:auto;">⌘K</span></button>' +
+      '<button type="button" class="pop-item" data-pop="theme">🌓 Toggle theme</button><div class="pop-sep"></div>' +
+      '<button type="button" class="pop-item danger" data-pop="signout">Sign out</button>',
+      { onSelect: (act) => {
+        closePopover();
+        if (act === 'profile') go('settings');
+        else if (act === 'search') openPalette();
+        else if (act === 'theme') toggleTheme();
+        else if (act === 'signout') { go('auth'); toast('Signed out'); }
+      } });
+  }
+
+  function noteMenu(anchor) {
+    const n = noteById(state.activeNote);
+    if (!n) return;
+    openPopover(anchor,
+      '<button type="button" class="pop-item" data-pop="pin">' + (n.pinned ? '📌 Unpin note' : '📌 Pin note') + '</button>' +
+      '<button type="button" class="pop-item" data-pop="dup">⧉ Duplicate</button><div class="pop-sep"></div>' +
+      '<button type="button" class="pop-item danger" data-pop="del">🗑 Delete note</button>',
+      { onSelect: (act) => {
+        closePopover();
+        if (act === 'pin') { n.pinned = !n.pinned; renderNotesList(); renderNote(); toast(n.pinned ? 'Note pinned' : 'Note unpinned'); }
+        else if (act === 'dup') { const c = createNote({ title: n.title + ' (copy)', icon: n.icon, folder: n.folder, tags: n.tags.slice(), body: n.body, preview: n.preview }); selectNote(c.id); toast('Note duplicated'); }
+        else if (act === 'del') {
+          const idx = state.notes.indexOf(n);
+          state.notes.splice(idx, 1);
+          const list = filteredNotes();
+          state.activeNote = list.length ? list[0].id : null;
+          renderNotesList(); renderNote(); renderRecentNotes();
+          toast('Note deleted', { action: 'Undo', onAction: () => { state.notes.splice(idx, 0, n); state.activeNote = n.id; renderNotesList(); renderNote(); renderRecentNotes(); } });
+        }
+      } });
+  }
+
+  function exportJson() {
+    const data = { exportedAt: new Date().toISOString(), workspaces: state.workspaces, projects: state.projects.map((p) => Object.assign({}, p, { board: state.boards[p.id] || null })), notes: state.notes };
+    if (download('flowdesk-export.json', JSON.stringify(data, null, 2), 'application/json')) toast('Exported boards and notes');
+  }
+  function exportNotes() {
+    const md = state.notes.map((n) => '# ' + (n.title || 'Untitled note') + '\n\n_' + topFolder(n.folder) + (n.tags.length ? ' · ' + n.tags.join(', ') : '') + '_\n\n' + plainText(n.body)).join('\n\n---\n\n');
+    if (download('flowdesk-notes.md', md, 'text/markdown')) toast('Exported ' + state.notes.length + ' notes');
+  }
+
+  /* ───────────── auth ───────────── */
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function showError(id, msg, field) {
+    const el = document.getElementById(id);
+    el.textContent = msg; el.hidden = false;
+    if (field) { field.setAttribute('aria-invalid', 'true'); field.focus(); }
+  }
+  function clearErrors(form) {
+    $$('.form-error', form).forEach((e) => { e.hidden = true; });
+    $$('[aria-invalid]', form).forEach((e) => e.removeAttribute('aria-invalid'));
+  }
+  function switchAuth(mode) {
+    $('#auth-right-login').style.display = mode === 'login' ? 'flex' : 'none';
+    $('#auth-right-register').style.display = mode === 'login' ? 'none' : 'flex';
+    const f = $(mode === 'login' ? '#li-email' : '#rg-first');
+    if (f) f.focus();
+  }
+
+  /* ───────────── settings navigation ───────────── */
+  const SETTINGS_TARGET = { Profile: 'set-profile', Security: 'set-security', Notifications: 'set-notifications', Workspaces: 'set-workspaces', Appearance: 'set-appearance', Language: 'set-language', 'Export data': 'set-export', 'Danger zone': 'set-danger' };
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+  }
+  const labelOf = (el) => {
+    const c = el.cloneNode(true);
+    $$('.s-icon,.s-count,.folder-icon,.proj-dot,.ws-chevron', c).forEach((n) => n.remove());
+    return c.textContent.trim();
+  };
+  function flash(el) { el.classList.remove('panel-flash'); void el.offsetWidth; el.classList.add('panel-flash'); }
+
+  function handleSidebarItem(el) {
+    const inSettings = !!el.closest('#screen-settings');
+    const label = labelOf(el);
+    if (inSettings) {
+      $$('#screen-settings .sidebar-item').forEach((i) => i.classList.toggle('active', i === el));
+      if (SETTINGS_TARGET[label]) scrollToSection(SETTINGS_TARGET[label]);
+      return;
+    }
+    switch (label) {
+      case 'Home': go('dashboard'); break;
+      case 'My Tasks': go('dashboard'); { const p = $('#panel-tasks'); p.scrollIntoView({ block: 'center' }); flash(p); } break;
+      case 'Calendar': toast('Calendar isn’t part of v1 — it stays a design placeholder for now.'); break;
+      case 'Quick Capture': go('dashboard'); setTimeout(() => $('#qc-text').focus(), 0); break;
+      case 'All Notes': openNotes('all'); break;
+      case 'Pinned': openNotes('pinned'); break;
+      case 'Folders': openNotes('all'); break;
+      case 'Settings': go('settings'); break;
+      default: break;
+    }
+  }
+
+  /* ───────────── global event handling ───────────── */
+  const ACTIONS = {
+    'open-search': () => openPalette(),
+    theme: () => toggleTheme(),
+    notifications: (el) => notificationsMenu(el),
+    'avatar-menu': (el) => avatarMenu(el),
+    'toggle-pass': (el) => {
+      const input = el.parentElement.querySelector('input');
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      el.setAttribute('aria-pressed', String(show));
+      el.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    },
+    forgot: async () => {
+      const v = await formDialog({ title: 'Reset your password', sub: 'We’ll email you a link to choose a new one.', fields: [{ name: 'email', label: 'Email address', value: $('#li-email').value, placeholder: 'you@example.com' }], confirm: 'Send reset link', check: (x) => (EMAIL_RE.test(x.email) ? '' : 'Enter a valid email address.') });
+      if (v) toast('If an account exists for ' + v.email + ', a reset link is on its way.');
+    },
+    google: () => toast('Google sign-in isn’t wired up in this preview — v1 uses email and password.'),
+    'qc-task': () => {
+      const t = $('#qc-text');
+      const text = t.value.trim();
+      if (!text) return;
+      state.tasks.unshift({ id: uid('t'), text, priority: 'medium', due: 'Today', done: false });
+      t.value = ''; syncQuickCapture(); renderTasks();
+      toast('Task added');
+    },
+    'qc-note': () => {
+      const t = $('#qc-text');
+      const text = t.value.trim();
+      if (!text) return;
+      const first = text.split('\n')[0].slice(0, 60);
+      const n = createNote({ title: first, folder: 'Personal', body: '<p>' + esc(text).replace(/\n/g, '<br>') + '</p>', preview: text.slice(0, 110) });
+      t.value = ''; syncQuickCapture();
+      toast('Saved as a note', { action: 'Open', onAction: () => openNote(n.id) });
+    },
+    'tasks-toggle': () => { state.hideDone = !state.hideDone; renderTasks(); },
+    'new-workspace': () => newWorkspace(),
+    'new-project': () => newProject(),
+    'new-folder': () => newFolder(),
+    'add-card-top': () => { go('kanban'); addCardTo(board().columns[0].id); },
+    'board-export': () => {
+      const p = project();
+      if (download(slug(p.name) + '-board.json', JSON.stringify({ project: p, board: board() }, null, 2), 'application/json')) toast('Board exported');
+    },
+    'new-note': () => newNote(),
+    'note-export': () => {
+      const n = noteById(state.activeNote);
+      if (!n) return;
+      if (download(slug(n.title || 'note') + '.md', '# ' + n.title + '\n\n' + plainText(n.body), 'text/markdown')) toast('Note exported');
+    },
+    'note-more': (el) => noteMenu(el),
+    'toggle-refs': (el) => {
+      const open = $('#ref-panel').classList.toggle('open');
+      el.setAttribute('aria-pressed', String(open));
+    },
+    'add-ref': async () => {
+      const v = await formDialog({ title: 'Add reference', fields: [{ name: 'title', label: 'Title', placeholder: 'e.g. Crawling the Web' }, { name: 'meta', label: 'Source', placeholder: 'Author · Publication · Year' }], confirm: 'Add reference' });
+      if (!v) return;
+      state.refs.push({ id: uid('r'), title: v.title, meta: v.meta });
+      renderRefs();
+      toast('Reference added');
+    },
+    'add-tag': async () => {
+      const n = noteById(state.activeNote);
+      if (!n) return;
+      const v = await formDialog({ title: 'Add tag', fields: [{ name: 'tag', label: 'Tag', placeholder: 'e.g. research' }], confirm: 'Add tag' });
+      if (!v) return;
+      const tag = slug(v.tag);
+      if (!tag || n.tags.includes(tag)) return;
+      n.tags.push(tag); renderNoteTags(n);
+    },
+    'so-add-tag': async () => {
+      const found = findCard(state.openCardId);
+      if (!found) return;
+      const v = await formDialog({ title: 'Add tag', fields: [{ name: 'tag', label: 'Tag', placeholder: 'e.g. backend' }], confirm: 'Add tag' });
+      if (!v) return;
+      const tag = slug(v.tag);
+      if (!tag || found.card.tags.includes(tag)) return;
+      found.card.tags.push(tag); renderSoTags(found.card); setSoDirty(true);
+    },
+    'so-save': () => saveCard(),
+    'so-delete': () => deleteCard(),
+    'settings-save': () => { settingsSnapshot = captureSettings(); applyAppearance(); toast('Settings saved'); },
+    'settings-cancel': () => { if (settingsSnapshot) restoreSettings(settingsSnapshot); toast('Changes discarded'); },
+    'persona-save': () => {
+      const cards = $$('#screen-settings .persona-card');
+      const active = cards.filter((c) => c.classList.contains('active'));
+      if (!active.length) { toast('Pick at least one persona.'); return; }
+      document.body.dataset.researcher = cards[2].classList.contains('active') ? 'on' : 'off';
+      settingsSnapshot = captureSettings();
+      toast('Persona updated');
+    },
+    'upload-photo': () => $('#photo-file').click(),
+    'remove-photo': () => { const a = $('#profile-avatar'); a.style.backgroundImage = ''; a.textContent = state.user.initials; toast('Photo removed'); },
+    'export-json': () => exportJson(),
+    'export-notes': () => exportNotes(),
+    'end-session': (el) => { const row = el.closest('[data-session]'); row.remove(); toast('Signed out of that device'); },
+    'delete-account': async () => {
+      const v = await formDialog({ title: 'Delete your account?', sub: 'This permanently removes your workspaces, boards and notes. Type DELETE to confirm.', fields: [{ name: 'confirm', label: 'Confirmation', placeholder: 'DELETE' }], confirm: 'Delete account', danger: true, check: (x) => (x.confirm === 'DELETE' ? '' : 'Type DELETE exactly to continue.') });
+      if (v) { go('auth'); toast('Account deleted (preview only — nothing was removed).'); }
+    },
+  };
+
+  function syncQuickCapture() {
+    const has = $('#qc-text').value.trim().length > 0;
+    $$('[data-action="qc-task"],[data-action="qc-note"]').forEach((b) => { b.disabled = !has; });
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.closest('a[href="#"]')) e.preventDefault();
+
+    // mobile drawer
+    if (t.closest('.menu-btn')) { document.body.classList.toggle('nav-open'); return; }
+    if (t.closest('.nav-scrim')) { document.body.classList.remove('nav-open'); return; }
+
+    const actionEl = t.closest('[data-action]');
+    if (actionEl && ACTIONS[actionEl.dataset.action]) { ACTIONS[actionEl.dataset.action](actionEl, e); return; }
+
+    const goEl = t.closest('[data-go]');
+    if (goEl) { go(goEl.dataset.go); return; }
+
+    // tasks
+    const taskRow = t.closest('.task-item');
+    if (taskRow) {
+      const task = state.tasks.find((x) => x.id === taskRow.dataset.task);
+      if (task) { task.done = !task.done; renderTasks(); }
+      return;
+    }
+
+    // projects
+    const proj = t.closest('[data-project]');
+    if (proj) { document.body.classList.remove('nav-open'); openProject(proj.dataset.project); return; }
+    const noteOpen = t.closest('[data-note-open]');
+    if (noteOpen) { openNote(noteOpen.dataset.noteOpen); return; }
+
+    // workspace chip
+    const chip = t.closest('.ws-chip');
+    if (chip) { workspaceMenu(chip); return; }
+
+    // sidebar items (static ones)
+    const sb = t.closest('.sidebar-item');
+    if (sb) { document.body.classList.remove('nav-open'); handleSidebarItem(sb); return; }
+
+    // kanban
+    const so = t.closest('[data-so-remove-tag]');
+    if (so) {
+      const found = findCard(state.openCardId);
+      if (found) { found.card.tags = found.card.tags.filter((x) => x !== so.dataset.soRemoveTag); renderSoTags(found.card); setSoDirty(true); }
+      return;
+    }
+    const addTo = t.closest('[data-add-to]');
+    if (addTo) { addCardTo(addTo.dataset.addTo); return; }
+    if (t.closest('[data-add-col]')) { state.composing = { newCol: true }; renderBoard(); return; }
+    if (t.closest('[data-composer-cancel]')) { state.composing = null; renderBoard(); return; }
+    const cardEl = t.closest('[data-card]');
+    if (cardEl) { openCard(cardEl.dataset.card); return; }
+    const filter = t.closest('.filter-chip');
+    if (filter) { state.filter = filter.dataset.filter; renderBoard(); return; }
+    const view = t.closest('.view-btn');
+    if (view) { state.view = view.dataset.view; renderBoard(); return; }
+
+    // notes
+    const nf = t.closest('[data-nfilter]');
+    if (nf) { document.body.classList.remove('nav-open'); openNotes(nf.dataset.nfilter); return; }
+    const noteItem = t.closest('.note-list-item');
+    if (noteItem) { selectNote(noteItem.dataset.note); return; }
+    const rm = t.closest('[data-remove-tag]');
+    if (rm) { const n = noteById(state.activeNote); if (n) { n.tags = n.tags.filter((x) => x !== rm.dataset.removeTag); renderNoteTags(n); } return; }
+    const ts = t.closest('[data-tag-search]');
+    if (ts) { openPalette(ts.dataset.tagSearch); return; }
+    const ref = t.closest('[data-ref]');
+    if (ref) {
+      const r = state.refs.find((x) => x.id === ref.dataset.ref);
+      if (r) {
+        const text = r.title + ' — ' + r.meta;
+        try { navigator.clipboard.writeText(text).then(() => toast('Citation copied'), () => toast('Couldn’t copy — select the text instead.')); }
+        catch (err) { toast('Couldn’t copy — select the text instead.'); }
+      }
+      return;
+    }
+
+    // settings
+    const wsEdit = t.closest('[data-ws-edit]');
+    if (wsEdit) {
+      const w = state.workspaces.find((x) => x.id === wsEdit.dataset.wsEdit);
+      formDialog({ title: 'Edit workspace', fields: [{ name: 'name', label: 'Workspace name', value: w.name }, { name: 'type', label: 'Type', type: 'select', value: w.type, options: ['work', 'study', 'research'] }], confirm: 'Save workspace' })
+        .then((v) => { if (!v) return; w.name = v.name; w.type = v.type; renderWorkspaces(); toast('Workspace updated'); });
+      return;
+    }
+    const tog = t.closest('[data-toggle]');
+    if (tog) {
+      const cls = tog.dataset.toggle;
+      tog.classList.toggle(cls);
+      tog.setAttribute('aria-pressed', String(tog.classList.contains(cls)));
+      return;
+    }
+
+    // auth tabs & links
+    const authTab = t.closest('.auth-tab');
+    if (authTab) { switchAuth(authTab.textContent.trim() === 'Sign in' ? 'login' : 'register'); return; }
+    const authLink = t.closest('.auth-footer a');
+    if (authLink) { switchAuth(/Create/.test(authLink.textContent) ? 'register' : 'login'); return; }
+    const tbtn = t.closest('.toolbar-btn[data-cmd]');
+    if (tbtn) { runCommand(tbtn.dataset.cmd, tbtn.parentElement); return; }
+  });
+
+  // keep editor selection when pressing toolbar buttons
+  document.addEventListener('mousedown', (e) => { if (e.target.closest('.toolbar-btn')) e.preventDefault(); });
+
+  document.addEventListener('keydown', (e) => {
+    // global search shortcut
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (!$('.modal-overlay')) openPalette(); return; }
+    if (e.key === 'Escape') {
+      if (activePop) { const a = activePop.anchor; closePopover(); if (a && a.focus) a.focus(); return; }
+      if (state.openCardId && !$('.modal-overlay')) { closeSlideover(); return; }
+      if (document.body.classList.contains('nav-open')) { document.body.classList.remove('nav-open'); return; }
+      if (state.composing) { state.composing = null; renderBoard(); return; }
+    }
+    // keyboard activation for role="button" items that are not native buttons
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute && e.target.getAttribute('role') === 'button' && !/^(BUTTON|A|INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
+      e.preventDefault();
+      e.target.click();
+    }
+    // composer: Enter submits, Shift+Enter newline
+    if (e.key === 'Enter' && !e.shiftKey && e.target.matches && e.target.matches('.composer textarea')) {
+      e.preventDefault();
+      e.target.form.requestSubmit();
+    }
+    // note title: Enter jumps to the body
+    if (e.key === 'Enter' && e.target.id === 'note-title') { e.preventDefault(); $('#note-body').focus(); }
+  });
+
+  document.addEventListener('submit', (e) => {
+    const form = e.target;
+    if (form.id === 'auth-right-login') {
+      e.preventDefault(); clearErrors(form);
+      const email = $('#li-email'), pass = $('#li-pass');
+      if (!EMAIL_RE.test(email.value.trim())) { showError('li-error', 'Enter a valid email address, like you@example.com.', email); return; }
+      if (!pass.value) { showError('li-error', 'Enter your password.', pass); return; }
+      state.user.email = email.value.trim();
+      toast('Welcome back, ' + state.user.first);
+      go('dashboard');
+    } else if (form.id === 'auth-right-register') {
+      e.preventDefault(); clearErrors(form);
+      const first = $('#rg-first'), last = $('#rg-last'), email = $('#rg-email'), pass = $('#rg-pass');
+      if (!first.value.trim()) { showError('rg-error', 'Enter your first name.', first); return; }
+      if (!EMAIL_RE.test(email.value.trim())) { showError('rg-error', 'Enter a valid email address, like you@example.com.', email); return; }
+      if (pass.value.length < 8) { showError('rg-error', 'Use at least 8 characters for your password.', pass); return; }
+      if (!$$('.auth-persona-card.selected', form).length) { showError('rg-error', 'Pick at least one persona to personalize Flowdesk.'); return; }
+      state.user.first = first.value.trim();
+      state.user.initials = (first.value.trim()[0] + (last.value.trim()[0] || '')).toUpperCase();
+      state.user.email = email.value.trim();
+      $('#set-email').value = state.user.email;
+      applyUser(); renderTasks();
+      toast('Account created — welcome, ' + state.user.first + '!');
+      go('dashboard');
+    } else if (form.id === 'pw-form') {
+      e.preventDefault(); clearErrors(form);
+      const cur = $('#pw-current'), nw = $('#pw-new'), cf = $('#pw-confirm');
+      if (!cur.value) { showError('pw-error', 'Enter your current password.', cur); return; }
+      if (nw.value.length < 8) { showError('pw-error', 'Use at least 8 characters for the new password.', nw); return; }
+      if (nw.value !== cf.value) { showError('pw-error', 'The new passwords don’t match.', cf); return; }
+      form.reset(); toast('Password updated');
+    } else if (form.matches && form.matches('[data-composer]')) {
+      e.preventDefault();
+      const ta = $('textarea', form);
+      const title = ta.value.trim();
+      if (!title) { state.composing = null; renderBoard(); return; }
+      const b = board();
+      b.cards.push({ id: uid('c'), col: form.dataset.composer, title, priority: 'medium', tags: [], due: '' });
+      renderBoard();
+      renderProjects();
+    } else if (form.matches && form.matches('[data-composer-col]')) {
+      e.preventDefault();
+      const name = $('input', form).value.trim();
+      state.composing = null;
+      if (name) {
+        board().columns.push({ id: uid('col'), title: name, cls: 'col-custom', accent: 'var(--accent-500)', badge: 'badge-violet' });
+        toast('Column “' + name + '” added');
+      }
+      renderBoard();
+    }
+  });
+
+  /* inputs */
+  document.addEventListener('input', (e) => {
+    const t = e.target;
+    if (t.id === 'qc-text') syncQuickCapture();
+    else if (t.id === 'note-title') {
+      const n = noteById(state.activeNote);
+      if (n) { n.title = t.value; $('#note-crumb').innerHTML = 'Notes / ' + esc(topFolder(n.folder)) + ' / <span>' + esc(n.title || 'Untitled note') + '</span>'; const li = $('[data-note="' + n.id + '"] .note-list-title'); if (li) li.textContent = n.title || 'Untitled note'; noteEdited(); autosizeTitle(); }
+    }
+    else if (t.id === 'note-body') {
+      const n = noteById(state.activeNote);
+      if (n) { n.body = t.innerHTML; n.preview = plainText(n.body).slice(0, 110); const pv = $('[data-note="' + n.id + '"] .note-list-preview'); if (pv) pv.textContent = n.preview; noteEdited(); }
+    }
+    else if (t.id === 'so-title' || t.id === 'so-editor' || t.id === 'so-due') {
+      if (t.id === 'so-due') t.dataset.over = String(/overdue/i.test(t.value));
+      setSoDirty(true);
+    }
+    if (t.getAttribute && t.getAttribute('aria-invalid')) t.removeAttribute('aria-invalid');
+  });
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.id === 'so-priority') { paintPrioritySelect(); setSoDirty(true); }
+    else if (t.id === 'so-status') setSoDirty(true);
+    else if (t.id === 'so-file') {
+      const found = findCard(state.openCardId);
+      if (found) {
+        found.card.files = (found.card.files || []).concat(Array.from(t.files).map((f) => f.name));
+        $('#so-attach').textContent = '📎 ' + found.card.files.length + (found.card.files.length === 1 ? ' attachment' : ' attachments');
+        toast('Attached ' + t.files.length + (t.files.length === 1 ? ' file (name only in this preview)' : ' files (names only in this preview)'));
+        t.value = '';
+      }
+    }
+    else if (t.id === 'photo-file') {
+      const f = t.files && t.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => { const a = $('#profile-avatar'); a.textContent = ''; a.style.backgroundImage = 'url(' + reader.result + ')'; toast('Photo updated'); };
+      reader.readAsDataURL(f);
+    }
+    else if (t.id === 'sel-theme' || t.id === 'sel-lang' || t.id === 'tg-compact' || t.id === 'tg-projcolors') applyAppearance();
+    else if (t.matches && t.matches('.editor-area input[type="checkbox"], .note-body input[type="checkbox"]')) {
+      // keep checkbox state in the saved HTML
+      if (t.checked) t.setAttribute('checked', ''); else t.removeAttribute('checked');
+      const ed = t.closest('[contenteditable]');
+      if (ed) ed.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+
+  /* drag & drop (mouse) — touch users change the Status field in the card panel */
+  let dragId = null;
+  document.addEventListener('dragstart', (e) => {
+    const c = e.target.closest && e.target.closest('.k-card');
+    if (!c) return;
+    dragId = c.dataset.card;
+    c.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', dragId); } catch (err) { /* ignore */ }
+  });
+  document.addEventListener('dragend', () => {
+    dragId = null;
+    $$('.k-card.dragging').forEach((c) => c.classList.remove('dragging'));
+    $$('.kanban-col.drag-over').forEach((c) => c.classList.remove('drag-over'));
+  });
+  document.addEventListener('dragover', (e) => {
+    const col = e.target.closest && e.target.closest('.kanban-col');
+    if (!col || !dragId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    $$('.kanban-col.drag-over').forEach((c) => { if (c !== col) c.classList.remove('drag-over'); });
+    col.classList.add('drag-over');
+  });
+  document.addEventListener('drop', (e) => {
+    const col = e.target.closest && e.target.closest('.kanban-col');
+    if (!col || !dragId) return;
+    e.preventDefault();
+    const cards = $$('.k-card:not(.dragging)', col);
+    const next = cards.find((c) => { const r = c.getBoundingClientRect(); return e.clientY < r.top + r.height / 2; });
+    const id = dragId;
+    dragId = null;
+    moveCard(id, col.dataset.col, next ? next.dataset.card : null);
+  });
+
+  document.addEventListener('selectionchange', syncToolbarState);
+  window.addEventListener('resize', () => { if (window.innerWidth > 900) document.body.classList.remove('nav-open'); });
+  if (window.matchMedia) {
+    const mq = window.matchMedia('(prefers-color-scheme: light)');
+    const onChange = () => { if (state.themePref === 'system') applyTheme('system'); };
+    if (mq.addEventListener) mq.addEventListener('change', onChange);
+  }
+
+  /* settings scroll-spy */
+  function setupScrollSpy() {
+    const main = $('#screen-settings .main');
+    const ids = ['set-profile', 'set-security', 'set-notifications', 'set-workspaces', 'set-appearance', 'set-export', 'set-danger'];
+    const names = ['Profile', 'Security', 'Notifications', 'Workspaces', 'Appearance', 'Export data', 'Danger zone'];
+    let ticking = false;
+    main.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const top = main.getBoundingClientRect().top;
+        let current = 0;
+        ids.forEach((id, i) => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top - top < 140) current = i; });
+        $$('#screen-settings .sidebar-item').forEach((it) => it.classList.toggle('active', labelOf(it) === names[current]));
+      });
+    }, { passive: true });
+  }
+
+  /* ───────────── expose the few globals the HTML attributes call ───────────── */
+  window.show = show;
+  window.switchAuth = switchAuth;
+  window.closeSlideover = closeSlideover;
+  window.openSlideover = () => { const c = board().cards[0]; if (c) openCard(c.id); };
+  window.toggleRef = () => ACTIONS['toggle-refs']($('.ref-toggle'));
+
+  /* ───────────── init ───────────── */
+  function init() {
+    // hamburger buttons for the mobile drawer
+    $$('.topbar').forEach((tb) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'icon-btn menu-btn'; b.setAttribute('aria-label', 'Open navigation'); b.textContent = '☰';
+      tb.insertBefore(b, tb.firstChild);
+    });
+    const scrim = document.createElement('div'); scrim.className = 'nav-scrim'; document.body.appendChild(scrim);
+
+    // tabs get proper tab semantics
+    $$('.s-tab').forEach((t) => t.setAttribute('role', 'tab'));
+    // original inline handlers on tabs keep working through window.show
+
+    setupToolbars();
+    renderSettingsRows();
+    renderTasks();
+    renderProjects();
+    renderHeatmap();
+    renderRecentNotes();
+    renderRefs();
+    renderNotesList();
+    renderNote();
+    renderWorkspaces();
+    applyUser();
+    syncQuickCapture();
+    paintBell();
+    setupScrollSpy();
+    enhance();
+
+    let pref = 'dark';
+    try { pref = localStorage.getItem('flowdesk-theme') || 'dark'; } catch (e) { /* storage unavailable */ }
+    if (!['system', 'light', 'dark'].includes(pref)) pref = 'dark';
+    $('#sel-theme').value = pref;
+    applyTheme(pref);
+    settingsSnapshot = captureSettings();
+
+    const hash = (location.hash || '').replace('#', '');
+    show(SCREENS.includes(hash) ? hash : 'auth');
+  }
+
+  init();
+})();
+
+</script>
+</body>
+</html>
